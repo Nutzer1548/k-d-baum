@@ -13,6 +13,7 @@ let HEIGHT=512;
 let points=[];
 
 let kdtree=null;
+let crossPath=null;
 
 let selectedPoint={
 	point: null,
@@ -31,6 +32,13 @@ function init(){
 	}
 	// sort in tree
 	for(let i=0; i<points.length; i++) treeAdd(points[i]);
+	// cross-shape (for points)
+	let s=2;
+	crossPath=new Path2D();
+	crossPath.moveTo(-s, -s);
+	crossPath.lineTo(+s, +s);
+	crossPath.moveTo(-s, +s);
+	crossPath.lineTo(+s, -s);
 	// draw
 	draw();
 	// events
@@ -50,13 +58,16 @@ function init(){
 
 // draws a Point object
 function pset(ctx,p){
-	let s=1;
-	ctx.fillRect(p.x-s, p.y-s, 2*s+1, 2*s+1);
-	ctx.beginPath();
-	ctx.moveTo(p.x, p.y-s);
-	ctx.lineTo(p.x, p.y+s);
-	ctx.moveTo(p.x-s, p.y);
-	ctx.lineTo(p.x+s, p.y);
+//	ctx.fillRect(p.x-s, p.y-s, 2*s+1, 2*s+1);
+//	let s=2;
+	ctx.translate(p.x,p.y);
+	ctx.stroke(crossPath);
+	ctx.translate(-p.x,-p.y);
+	/*ctx.beginPath();
+	ctx.moveTo(p.x-s, p.y-s);
+	ctx.lineTo(p.x+s, p.y+s);
+	ctx.moveTo(p.x-s, p.y+s);
+	ctx.lineTo(p.x+s, p.y-s);
 	ctx.stroke(); // */
 }
 

@@ -205,18 +205,20 @@ function drawNode(ctx, node, rect){
 
 
 /* treeFindNearest()
-   Findest den Knoten, welcher 'x'/'y' am nächsten ist und speichert den
-   betreffenden Knoten in 'selectedPoint', zusammen mit dessen Entfernung.
-   x: X-Koordinate des zu suchenden Wertes
-   y: Y-Koordinate des zu suchenden Wertes
-   node: Knoten bei dem mit der Suche begonnen werden soll. Wenn nicht
-         angegeben, wird die Wurzel von 'kdtree' benutzt.
-   nearest: Bisher kürzester Abstand. Wenn nicht angegeben, wird die Diagonale
-            als kürzester Wert angennommen.
+Findet den Knoten, welcher 'x'/'y' am nächsten ist und speichert den
+betreffenden Knoten in 'selectedPoint', zusammen mit dessen Entfernung.
+
+x: X-Koordinate des zu suchenden Wertes
+y: Y-Koordinate des zu suchenden Wertes
+node: Knoten bei dem mit der Suche begonnen werden soll. Wenn nicht
+      angegeben, wird die Wurzel von 'kdtree' benutzt.
+nearest: Bisher kürzester Abstand. Wenn nicht angegeben, wird die Diagonale
+         als kürzester Wert angennommen.
+return: kürzeste gefundene Entfernung
 */
 function treeFindNearest(x,y,node,nearest){
 	if(typeof node==="undefined") node=kdtree;
-	if(node===null) return;
+	if(node===null) return nearest;
 	if(typeof nearest==="undefined") nearest=Math.sqrt(WIDTH*WIDTH, HEIGHT*HEIGHT);
 
 	let dx=Math.abs(x-node.pnt.x);
@@ -232,12 +234,16 @@ function treeFindNearest(x,y,node,nearest){
 	}
 
 	if(node.dim==0){
-		if(x>node.pnt.x) treeFindNearest(x,y, node.right, nearest);
-		else treeFindNearest(x,y, node.left, nearest);
+		//if(x>node.pnt.x) treeFindNearest(x,y, node.right, nearest);
+		//else treeFindNearest(x,y, node.left, nearest);
+		if(x+nearest>node.pnt.x) nearest=treeFindNearest(x,y, node.right, nearest);
+		if(x-nearest<=node.pnt.x) nearest=treeFindNearest(x,y, node.left, nearest);
 	}else{
-		if(y>node.pnt.y) treeFindNearest(x,y, node.right, nearest);
-		else treeFindNearest(x,y, node.left, nearest);
+		//if(y>node.pnt.y) treeFindNearest(x,y, node.right, nearest);
+		//else treeFindNearest(x,y, node.left, nearest);
+		if(y+nearest>node.pnt.y) nearest=treeFindNearest(x,y, node.right, nearest);
+		if(y-nearest<=node.pnt.y) nearest=treeFindNearest(x,y, node.left, nearest);
 	}
-
+	return nearest;
 }// end treeFindNearest()
 

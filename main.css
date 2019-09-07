@@ -1,0 +1,11 @@
+body{
+	background:#ddd;
+}
+
+#divcanvas{
+	position:relative;
+}
+#canvas{
+	background:#fff;
+	position:absolute;
+}

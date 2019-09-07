@@ -66,7 +66,7 @@ function draw(){
 	if(!canvas.getContext) return;
 	let ctx=canvas.getContext("2d");
 	ctx.lineWidth=1;
-	ctx.translate(0.5, 0.5); // für scharfe, pixelgenaue Linien bei einer Linienbreite von 1
+	ctx.setTransform(1,0,0,1,0.5,0.5);// für scharfe, pixelgenaue Linien bei einer Linienbreite von 1
 	ctx.fillStyle="#fff";
 	ctx.fillRect(0,0,WIDTH, HEIGHT);
 	//ctx.clearRect(0,0,WIDTH, HEIGHT);

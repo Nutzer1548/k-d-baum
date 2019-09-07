@@ -23,7 +23,7 @@ let selectedPoint={
 function init(){
 	// create points
 	points=[];
-	for(let i=0; i<15; i++){
+	for(let i=0; i<25; i++){
 		let x=Math.random()*WIDTH;
 		let y=Math.random()*HEIGHT;
 		x=Number.parseInt(x);
@@ -246,4 +246,17 @@ function treeFindNearest(x,y,node,nearest){
 	}
 	return nearest;
 }// end treeFindNearest()
+
+// findet den kleinsten X-Wert
+function treeFindMinX(node, currentMin){
+	if(typeof node==="undefined") node=kdtree;
+	if(node===null) return currentMin;
+	if(typeof currentMin!=="number") currentMin=node.pnt.x;
+	else currentMin=Math.min(node.pnt.x,currentMin);
+	if(node.dim==0) return treeFindMinX(node.left, currentMin);
+	currentMin=treeFindMinX(node.left, currentMin);
+	currentMin=treeFindMinX(node.right, currentMin);
+	return currentMin;
+}// end #treeFindMinX()
+
 

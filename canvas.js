@@ -88,6 +88,14 @@ function draw(){
 }// end #draw()
 
 
+/* Node
+   Struktur eines einzelnes Knotens.
+   pnt: (Point) Punkt des Knotens 
+   dim: Dimension (0=x, 1=y) anhand derer die nächste Unterteilung stattfinden
+        soll.
+   left: Knoten der in Dimension 'dim' kleiner oder gleich 'pnt' ist.
+   right: Knoten der in Dimension 'dim' größer als 'pnt' ist.
+*/
 function Node(pnt, dim){
 	this.pnt=pnt;
 	this.dim=dim;
@@ -96,6 +104,11 @@ function Node(pnt, dim){
 }// end #Node()
 
 
+/* treeAdd
+   Fügt den Punkt 'pnt' dem Knoten 'node' hinzu. Wenn 'node' nicht angegeben
+   wird, wird dem Wurzelelement kdtree hinzugefügt. Wenn kdtree leer ist,
+   wird des Wurzelelement mit dem Punkt 'pnt' erzeugt.
+*/
 function treeAdd(pnt, node){
 	if(typeof node==="undefined") node=kdtree;
 	if(kdtree===null){
@@ -129,6 +142,13 @@ function treeAdd(pnt, node){
 }// end #treeAdd()
 
 
+/* drawNode()
+   Stellt einen Knoten, bzw. seine Unterteilung dar. Rekursiv.
+   ctx: 2d-Grafikkontext
+   node: Darzustellender Knoten
+   rect: [x1,y1,x2,y1] -> Aktueller Rahmen/Wertebereich der durch diesen Knoten
+         und seine Unterknoten unterteilt wird.
+*/
 function drawNode(ctx, node, rect){
 	if(typeof ctx==="undefined") return;
 	if(node===null) return;
@@ -171,6 +191,16 @@ function drawNode(ctx, node, rect){
 }// end #drawNode()
 
 
+/* treeFindNearest()
+   Findest den Knoten, welcher 'x'/'y' am nächsten ist und speichert den
+   betreffenden Knoten in 'selectedPoint', zusammen mit dessen Entfernung.
+   x: X-Koordinate des zu suchenden Wertes
+   y: Y-Koordinate des zu suchenden Wertes
+   node: Knoten bei dem mit der Suche begonnen werden soll. Wenn nicht
+         angegeben, wird die Wurzel von 'kdtree' benutzt.
+   nearest: Bisher kürzester Abstand. Wenn nicht angegeben, wird die Diagonale
+            als kürzester Wert angennommen.
+*/
 function treeFindNearest(x,y,node,nearest){
 	if(typeof node==="undefined") node=kdtree;
 	if(node===null) return;

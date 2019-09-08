@@ -284,3 +284,37 @@ function treeFindMinX(node, currentMin){
 }// end #treeFindMinX()
 
 
+/* Findet den Bereich, in dem 'x'/'y' liegt und giebt diesen als Knoten und Rechteck zurück.
+
+*/
+function treeFindRegion(x,y,node,rect){
+	if(typeof node==="undefined") node=kdtree;
+	if(typeof rect==="undefined") rect=[0,0,WIDTH-1,HEIGHT-1];
+	let ret=[node,rect];
+
+	if(x==node.pnt.x && y==node.pnt.y) return ret; // <-?
+	
+	if(node.dim==0){
+		if(x>node.pnt.x){
+			rect[0]=node.pnt.x;
+			if(node.right===null) return ret;
+			ret=treeFindRegion(x,y,node.right,rect);
+		}else{
+			rect[2]=node.pnt.x;
+			if(node.left===null) return ret;
+			ret=treeFindRegion(x,y,node.left, rect);
+		}
+	}else{
+		if(y>node.pnt.y){
+			rect[1]=node.pnt.y;
+			if(node.right===null) return ret;
+			ret=treeFindRegion(x,y, node.right, rect);
+		}else{
+			rect[3]=node.pnt.y;
+			if(node.left===null) return ret;
+			ret=treeFindRegion(x,y, node.left, rect);
+		}
+	}
+	
+	return ret;
+}// end #treeFindRegion()

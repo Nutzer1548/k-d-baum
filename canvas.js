@@ -5,7 +5,8 @@ function Point(x,y){
 	this.y=y;
 	this.toString=function(){
 		return "P["+x+","+y+"]";
-	}
+	};
+	this.toArray=function(){return [x,y];};
 }// end #Point()
 
 let WIDTH=512;
@@ -284,7 +285,7 @@ function treeFindMinX(node, currentMin){
 }// end #treeFindMinX()
 
 
-/* Findet den Bereich, in dem 'x'/'y' liegt und giebt diesen als Knoten und Rechteck zurück.
+/* Findet den Bereich, in dem 'x'/'y' liegt und gibt diesen als Knoten und Rechteck zurück.
 
 */
 function treeFindRegion(x,y,node,rect){

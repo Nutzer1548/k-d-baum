@@ -318,3 +318,60 @@ function treeFindRegion(x,y,node,rect){
 	
 	return ret;
 }// end #treeFindRegion()
+
+/*
+Findet die Schnittpunkte des Strahls 'ray' mit dem Rechteck 'rect'.
+ray: {x,y,dx,dy}
+rect: [x1,y1,x2,y2]
+return: []: Jedes Element beinhaltet den Abstand 't' und den 'x'/'y' Schnittpunkt, also [t,x,y]
+	[
+		[t1,x1,y1]
+		[t2,x2,y2],
+		...
+	]
+*/
+function rayRectIntersection(ray, rect){
+	let t,x,y;
+	let hits=[];
+	//ray.x+t*ray.dx=rect[0]
+	if(ray.dx==0 && ray.dy==0) return hits;
+	// horizontale Kanten testen
+	if(ray.dx!=0){
+		t=(rect[0]-ray.x)/ray.dx;
+		y=ray.y+t*ray.dy;
+		if(y>=rect[1] && y<=rect[3]) hits.push([t,rect[0],y]);
+		
+		t=(rect[2]-ray.x)/ray.dx;
+		y=ray.y+t*ray.dy;
+		if(y>=rect[1] && y<=rect[3]) hits.push([t,rect[2],y]);
+	}else{
+		if(ray.x>=rect[0] && ray.x<=rect[2]){
+			//ray.y+t*ray.dy=rect[1]
+			t=(rect[1]-ray.y)/ray.dy;
+			hits.push([t, ray.x, rect[1]]);
+			t=(rect[3]-ray.y)/ray.dy;
+			hits.push([t, ray.x, rect[3]]);
+		}
+	}
+	// vertikale Kanten testen
+	if(ray.dy!=0){
+		t=(rect[1]-ray.y)/ray.dy;
+		x=ray.x+t*ray.dx;
+		if(y>=rect[0] && y<=rect[2]) hits.push([t,rect[1],y]);
+
+		t=(rect[3]-ray.y)/ray.dy;
+		x=ray.x+t*ray.dx;
+		if(y>=rect[0] && y<=rect[2]) hits.push([t,rect[3],y]);
+	}else{
+		if(ray.y>=rect[1] && ray.y<=rect[3]){
+			t=(rect[0]-ray.x)/ray.dx;
+			hits.push([t, rect[0], ray.y]);
+			t=(rect[2]-ray.x)/ray.dx;
+			hits.push([t, rect[2], ray.y]);
+		}
+	}
+
+	return hits;
+}// end #rayRectIntersection()
+
+

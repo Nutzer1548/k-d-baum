@@ -19,8 +19,15 @@ let selectedPoint={
 	point: null,
 	radius: 10
 };
+let selRect=null;
+
+let ray={x:0, y:480, dx:WIDTH, dy:50};
 
 function init(){
+	// Strahl normalisieren
+	let rayLen=Math.sqrt(Math.pow(ray.dx-ray.x,2) + Math.pow(ray.dy-ray.y,2));
+	ray.dx=(ray.dx-ray.x)/rayLen;
+	ray.dy=(ray.dy-ray.y)/rayLen;
 	// create points
 	points=[];
 	for(let i=0; i<25; i++){
@@ -97,6 +104,20 @@ function draw(){
 		let p=selectedPoint.point;
 		ctx.arc(p.x, p.y, selectedPoint.radius, 0, 2*Math.PI);
 		ctx.stroke();
+	}
+
+	// Strahl
+	ctx.strokeStyle="#f00";
+	let m=WIDTH/ray.dx;
+	ctx.beginPath();
+	ctx.moveTo(ray.x, ray.y);
+	ctx.lineTo(ray.x+m*ray.dx, ray.y+m*ray.dy);
+	ctx.stroke();
+
+	// selRect
+	if(selRect!==null){
+		ctx.strokeStyle="#f0f";
+		ctx.strokeRect(selRect[0], selRect[1], selRect[2]-selRect[0], selRect[3]-selRect[1]);
 	}
 }// end #draw()
 

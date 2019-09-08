@@ -73,6 +73,22 @@ function KDTree(point, dimension){
 		}
 		return Math.sqrt(sum);
 	};// end #pointDistance()
+
+	/*
+	finds the smalles value in dimension 'dimension' and returns it.
+	minVal: current smallest value. if not defined: value of current point in requested dimension
+	*/
+	this.findMin=function(dimension, minVal){
+		if(typeof minVal==="undefined") minVal=this.pnt[dimension];
+		else minVal=Math.min(minVal, this.pnt[dimension]);
+
+		if(this.nodes[0]!==null) minVal=this.nodes[0].findMin(dimension, minVal);
+		if(this.dim!=dimension){
+			if(this.nodes[1]!==null) minVal=this.nodes[1].findMin(dimension, minVal);
+		}
+
+		return minVal;
+	};// end #findMin()
 }// end KDTree()
 
 

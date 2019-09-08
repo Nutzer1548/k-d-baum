@@ -9,3 +9,15 @@ body{
 	background:#fff;
 	position:absolute;
 }
+
+#status{
+	font-family:monospace;
+	white-space:nowrap;
+	position:relative;
+	border:1px solid #444;
+	width:600px;
+	left:520px;
+	height:510px;
+	background:#000;
+	color:#eee;
+}

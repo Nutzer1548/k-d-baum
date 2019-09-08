@@ -30,7 +30,7 @@ function init(){
 	ray.dy=(ray.dy-ray.y)/rayLen;
 	// create points
 	points=[];
-	for(let i=0; i<25; i++){
+	for(let i=0; i<15; i++){
 		let x=Math.random()*WIDTH;
 		let y=Math.random()*HEIGHT;
 		x=Number.parseInt(x);
@@ -60,6 +60,9 @@ function init(){
 		treeFindNearest(x,y);
 		selectedPoint.point=new Point(x,y);
 		draw();
+	});
+	document.querySelector("#canvas").addEventListener('mousemove',function(e){
+		document.querySelector("#status").innerText="X:"+e.layerX+" \nY:"+e.layerY;
 	});
 }// end #init()
 

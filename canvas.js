@@ -357,11 +357,11 @@ function rayRectIntersection(ray, rect){
 	if(ray.dy!=0){
 		t=(rect[1]-ray.y)/ray.dy;
 		x=ray.x+t*ray.dx;
-		if(y>=rect[0] && y<=rect[2]) hits.push([t,rect[1],y]);
+		if(x>=rect[0] && x<=rect[2]) hits.push([t,x,rect[1]]);
 
 		t=(rect[3]-ray.y)/ray.dy;
 		x=ray.x+t*ray.dx;
-		if(y>=rect[0] && y<=rect[2]) hits.push([t,rect[3],y]);
+		if(x>=rect[0] && x<=rect[2]) hits.push([t,x,rect[3]]);
 	}else{
 		if(ray.y>=rect[1] && ray.y<=rect[3]){
 			t=(rect[0]-ray.x)/ray.dx;
@@ -370,6 +370,8 @@ function rayRectIntersection(ray, rect){
 			hits.push([t, rect[2], ray.y]);
 		}
 	}
+
+	hits.sort((a,b)=>a[0]-b[0]);
 
 	return hits;
 }// end #rayRectIntersection()

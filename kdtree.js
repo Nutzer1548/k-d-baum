@@ -89,6 +89,24 @@ function KDTree(point, dimension){
 
 		return minVal;
 	};// end #findMin()
+
+
+	/*
+	Finds the smalles region that contains 'point'
+	point: Point to location region for
+	region: [ lowerPoint, upperPoint]: starting-region. If not defined, set to
+	        maximum possible range (Number.MIN_VALUE - Number.MAX_VALUE)
+	return: the located region
+	*/
+	this.findRegion=function(point, region){
+		if(typeof region==="undefined") region=[Array(point.length).fill(Number.MIN_VALUE), Array(point.length).fill(Number.MAX_VALUE)];
+		let nodeIdx=0;
+		if(point[this.dim]>this.pnt[this.dim]) nodeIdx=1;
+		region[1-nodeIdx][this.dim]=this.pnt[this.dim]; 
+		if(this.nodes[nodeIdx]!==null) region=this.nodes[nodeIdx].findRegion(point, region);
+
+		return region;
+	};// end #findRegion()
 }// end KDTree()
 
 

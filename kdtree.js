@@ -1,5 +1,16 @@
 "use strict";
 /* kdtree.js
+Object to bild an k-d-tree and operate on it.
+Main-Object: KDTree
+.add(point): adds 'point' to tree
+.findNearestPoint(point, minDist): finds that point in tree, thats nearest to 'point' 
+.findMin(dim): returns smalest value along dimension 'dim'
+.findRegion(point, region): finds smallest region inside 'region' that contains 'point'
+
+(the following functions are 'static' as they do not access/need any tree-data)
+
+.pointDistance(p1,p2): returns distance of 2 points
+.rayRegionIntersection(ray, region); returns intersections of 'ray' with region
 
 */
 
@@ -13,8 +24,8 @@ function KDTree(point, dimension){
 	if(typeof dimension==="undefined") dimension=0;
 
 	this.pnt=point;
-	this.dim=dimension;
-	this.nodes=[null,null];
+	this.dim=dimension; // the dimension of splitting / aka. depth
+	this.nodes=[null,null]; // child nodes: nodes[0]=smaller or equal, nodes[1]=greater
 
 	/*
 	adds a new point to the current node
@@ -34,6 +45,8 @@ function KDTree(point, dimension){
 
 	/*
 	finds the point in this KDTree, that's nearest to point 'point'
+	point: point to approach to
+	minDist: initial distance to be beaten. If undefined, set to Number.MAX_VALUE
 	return: [point_in_tree, distance]
 	*/
 	this.findNearestPoint=function(point, minDist){
@@ -67,7 +80,6 @@ function KDTree(point, dimension){
 			console.log('dimension mismatch');
 			return Number.MAX_VALUE;
 		}
-		let p=new Array(pnt1.length);
 		let sum=0;
 		for(let i=0; i<pnt1.length; i++){
 			let p=pnt1[i]-pnt2[i];
@@ -95,9 +107,9 @@ function KDTree(point, dimension){
 
 	/*
 	Finds the smalles region that contains 'point'
-	point: Point to location region for
+	point: Point to locate region for
 	region: [ lowerPoint, upperPoint]: starting-region. If not defined, set to
-	        maximum possible range (Number.MIN_VALUE - Number.MAX_VALUE)
+	        maximum possible range (Number.MIN_VALUE to Number.MAX_VALUE)
 	return: the located region
 	*/
 	this.findRegion=function(point, region){
@@ -111,7 +123,7 @@ function KDTree(point, dimension){
 	};// end #findRegion()
 
 
-	/*
+	/* rayRegionIntersection(ray, region)
 	Finds intersections of 'ray' with 'region'. That are entry and exit-points,
 	if they exist), and returns the distance and the actual point.
 	ray: [ startPoint, direction]: expects 'direction' to be normalized,

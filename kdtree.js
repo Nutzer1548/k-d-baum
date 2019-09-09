@@ -4,11 +4,12 @@ Object to bild an k-d-tree and operate on it.
 Main-Object: KDTree
 .add(point): adds 'point' to tree
 .findNearestPoint(point, minDist): finds that point in tree, thats nearest to 'point' 
-.findMin(dim): returns smalest value along dimension 'dim'
+.findMin(dim): returns node with smalest value along dimension 'dim'
 .findRegion(point, region): finds smallest region inside 'region' that contains 'point'
 
 (the following functions are 'static' as they do not access/need any tree-data)
-
+.minNode(dim,...nodes): finds node with smallest value in dimension 'dim'
+.mayNode(dim,...nodes): finds node with highest value in dimension 'dim'
 .pointDistance(p1,p2): returns distance of 2 points
 .rayRegionIntersection(ray, region); returns intersections of 'ray' with region
 
@@ -89,19 +90,37 @@ function KDTree(point, dimension){
 	};// end #pointDistance()
 
 	/*
-	finds the smalles value in dimension 'dimension' and returns it.
-	minVal: current smallest value. if not defined: value of current point in requested dimension
+	returns the node with the smallest value in dimension 'dimension'
 	*/
-	this.findMin=function(dimension, minVal){
-		if(typeof minVal==="undefined") minVal=this.pnt[dimension];
-		else minVal=Math.min(minVal, this.pnt[dimension]);
+	this.nodeMin=function(dimension, ...nodes){
+		let n=0;
+		for(let i=1; i<nodes.length; i++) if(nodes[i][dimension]<nodes[n][dimension]) n=i;
+		return nodes[n];
+	};
 
-		if(this.nodes[0]!==null) minVal=this.nodes[0].findMin(dimension, minVal);
+	/*
+	returns the nodes with the highest value in dimension 'dimension'
+	*/
+	this.nodeMax=function(dimension, ...nodes){
+		let n=0;
+		for(let i=1; i<nodes.length; i++) if(nodes[i][dimension]>nodes[n][dimension]) n=i;
+		return nodes[n];
+	};
+
+	/*
+	Finds the node with the smalles value in dimension 'dimension' and returns it.
+	minNode: node with smallest value so far. if not defined: the current node is used
+	*/
+	this.findMin=function(dimension, minNode){
+		if(typeof minNode==="undefined") minNode=this;
+		else minNode=this.nodeMin(minNode, this);
+
+		if(this.nodes[0]!==null) minNode=this.nodes[0].findMin(dimension, minNode);
 		if(this.dim!=dimension){
-			if(this.nodes[1]!==null) minVal=this.nodes[1].findMin(dimension, minVal);
+			if(this.nodes[1]!==null) minVal=this.nodes[1].findMin(dimension, minNode);
 		}
 
-		return minVal;
+		return minNode;
 	};// end #findMin()
 
 

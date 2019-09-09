@@ -107,8 +107,74 @@ function KDTree(point, dimension){
 
 		return region;
 	};// end #findRegion()
+
+
+	/*
+	Finds intersections of 'ray' with 'region'. That are entry and exit-points,
+	if they exist), and returns the distance and the actual point.
+	ray: [ startPoint, direction]: expects 'direction' to be normalized,
+	     otherwise the returnd distance will be scaled by the length of
+		 'direction'
+	region: [ lowerPoint, upperPoint ]: the region to test intersection on.
+	return: [ [distance1, point1], [distance2, point2]]:
+	       'distance' is choosen to match ray[0]+distance*ray[1]=point.
+		   The number of Elements return depends on the actual number of number
+		   of hit points.
+	*/
+	this.rayRegionIntersection=function(ray, region){
+		let hits=[];
+
+		let tmin=Number.MIN_VALUE, tmax=Number.MAX_VALUE;
+
+		let p=Array(ray[0].dim).fill(0); // partial potential hit-point
+		for(let dim=0; dim<ray[0].length; dim++){
+			if(ray[1][dim]==0){
+				if(ray[0][dim]<region[0][dim] || ray[0][dim]>region[1][dim]) return [];
+				continue;
+			}
+			//ray[0][dim]+t*ray[1][dim]=region[0][dim]
+			let t0=(region[0][dim]-ray[0][dim])/ray[1][dim];
+			let t1=(region[1][dim]-ray[0][dim])/ray[1][dim];
+			if(t1<tmin || t0>tmax) return [];
+			tmin=Math.max(tmin, t0);
+			tmax=Math.min(tmax, t1);
+		}// end for dim
+
+		if(tmax<tmin) return [];
+
+		let p0=Array(ray[0].length).fill(0);
+		let p1=Array(ray[0].length).fill(0);
+		for(let dim=0; dim<ray[0].length; dim++){
+			p0[dim]=ray[0][dim]+tmin*ray[1][dim];
+			p1[dim]=ray[0][dim]+tmax*ray[1][dim];
+		}// end for dim
+
+		return [
+			[tmin, p0],
+			[tmax, p1]
+		];
+
+	};// end #rayRegionIntersection()
+
 }// end KDTree()
 
+/*function demo(){
+	let tree=new KDTree();
+
+	let point=[0,0,0];
+	let dir=[0.5, 0.4, 0.3];
+
+	let ray=[point, dir];
+
+	let lower=[1,1,1];
+	let upper=[2,2,2];
+
+	let region=[lower, upper];
+
+
+	let ret=tree.rayRegionIntersection(ray, region);
+	console.log(ret);
+}// end #demo()
 
 /*
 t=0;

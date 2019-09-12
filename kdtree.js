@@ -1,16 +1,24 @@
 "use strict";
 /* kdtree.js
 Object to bild an k-d-tree and operate on it.
+It kann add, remove and search points.
+A "point" in this tree is an array of numbers, where each index represents a distinct dimension.
+
 Main-Object: KDTree
 .add(point): adds 'point' to tree
 .nodeMin(dim): returns [node, parent] -> smallest node with parent
+.nodeMax(dim): returns [node, parent] -> biggest node with parent
 .findNearestPoint(point, minDist): finds that point in tree, thats nearest to 'point' 
 .findRegion(point, region): finds smallest region inside 'region' that contains 'point'
+.getNode(point): returns [node, parent] -> node that belongs to point.
+.isLeaf(): 'true' if thir node has no child nodes
+.removePoint(point): removes point _below_ this node
 
 (the following functions are 'static' as they do not access/need any tree-data)
 .minNode(dim,...nodes): finds node with smallest value in dimension 'dim'
 .maxNode(dim,...nodes): finds node with highest value in dimension 'dim'
 .pointDistance(p1,p2): returns distance of 2 points
+.pointEqual(p1,p2); returns true, if 'p1' and 'p2' are equal in every component.
 .rayRegionIntersection(ray, region); returns intersections of 'ray' with region
 
 */
@@ -117,7 +125,6 @@ function KDTree(point, dimension){
 	*/
 	this.nodeMin=function(dimension, root){
 		if(typeof root==="undefined") root=null;
-console.log("db: nodeMin(): this.pnt="+this.pnt+", dim="+this.dim);
 		if(this.dim==dimension){
 			if(this.nodes[0]===null) return [this, root];
 			return this.nodes[0].nodeMin(dimension, this);
@@ -156,7 +163,6 @@ console.log("db: nodeMin(): this.pnt="+this.pnt+", dim="+this.dim);
 	*/
 	this.nodeMax=function(dimension, root ){
 		if(typeof root==="undefined") root=null;
-console.log("db: nodeMax(): this.pnt="+this.pnt);
 		if(this.dim==dimension){
 			if(this.nodes[0]===null) return [this, root];
 			return this.nodes[0].nodeMax(dimension, this);
@@ -269,7 +275,6 @@ console.log("db: nodeMax(): this.pnt="+this.pnt);
 	return: true if successful, false otherwise
 	*/
 	this.removePoint=function(point){
-console.log("db: removePoint():"+point);
 		let node, nodeRoot;
 		[node, nodeRoot]=this.getNode(point);
 		if(node===null) return false; // point not found
@@ -300,6 +305,7 @@ console.log("db: removePoint():"+point);
 	/*
 	tests if 2 points are equal
 	if 'p2' is undefined, the current point is assumed
+	return: true, if the points are equal in every component
 	*/
 	this.pointEqual=function(p1,p2){
 		if(typeof p2==="undefined") p2=this.pnt;
@@ -327,35 +333,4 @@ console.log("db: removePoint():"+point);
 
 
 }// end KDTree()
-
-/*function demo(){
-	let tree=new KDTree();
-
-	let point=[0,0,0];
-	let dir=[0.5, 0.4, 0.3];
-
-	let ray=[point, dir];
-
-	let lower=[1,1,1];
-	let upper=[2,2,2];
-
-	let region=[lower, upper];
-
-
-	let ret=tree.rayRegionIntersection(ray, region);
-	console.log(ret);
-}// end #demo()
-
-/*
-t=0;
-// t=inters[1][0]+0.00001;
-[n,selRect]=treeFindRegion(ray.x+t*ray.dx, ray.y+t*ray.dy);
-draw();
-inters=rayRectIntersection(ray, selRect);
-
-tree=new KDTree(points[0].toArray()); for(let i=1; i<points.length; i++) tree.add(points[i].toArray())
-tree.findNearestNode([100,200])
-treeFindNearest([100,200])
-*/
-
 

@@ -12,6 +12,7 @@ function Point(x,y){
 let WIDTH=512;
 let HEIGHT=512;
 let points=[];
+let testTree; // for KDTree testing
 
 let kdtree=null;
 let crossPath=null;
@@ -38,6 +39,9 @@ function init(){
 		y=Number.parseInt(y);
 		points.push(new Point(x,y));
 	}
+
+	testTree=new KDTree(points[0].toArray()); for(let i=1; i<points.length; i++) testTree.add(points[i].toArray());
+
 	// sort in tree
 	for(let i=0; i<points.length; i++) treeAdd(points[i]);
 	// cross-shape (for points)
@@ -59,7 +63,7 @@ function init(){
 		/*let len=points.push(new Point(x,y));
 		treeAdd(points[len-1]); // */
 		treeFindNearest(x,y);
-		selectedPoint.point=new Point(x,y);
+		selectedPoint.mouse=new Point(x,y);
 		draw();
 	});
 	document.querySelector("#canvas").addEventListener('mousemove',function(e){
@@ -101,6 +105,8 @@ function draw(){
 	ctx.fillStyle="#f00";
 	ctx.strokeStyle="rgba(0,0,255,0.5)";
 	drawNode(ctx);
+
+	drawNode2(ctx);
 
 	if(selectedPoint.point!==null){
 		ctx.strokeStyle="rgba(255,0,0,0.75)";
@@ -227,6 +233,47 @@ function drawNode(ctx, node, rect){
 
 	
 }// end #drawNode()
+
+function regionClone(region){
+	return [region[0].slice(), region[1].slice()];
+}
+
+function drawNode2(ctx, node, region){
+	if(typeof node==="undefined") node=testTree;
+	if(typeof region==="undefined") region=[[0,0],[WIDTH,HEIGHT]];
+ctx.strokeStyle="rgba(100,100,0,0.5)";
+	if(node.dim==0){
+		ctx.beginPath();
+		ctx.moveTo(node.pnt[0], region[0][1]);
+		ctx.lineTo(node.pnt[0], region[1][1]);
+		ctx.stroke();
+		if(node.nodes[0]!==null){
+			let r=regionClone(region);
+			r[1][0]=node.pnt[0];
+			drawNode2(ctx, node.nodes[0], r);
+		}
+		if(node.nodes[1]!==null){
+			let r=regionClone(region);
+			r[0][0]=node.pnt[0];
+			drawNode2(ctx, node.nodes[1], r);
+		}
+	}else{
+		ctx.beginPath();
+		ctx.moveTo(region[0][0], node.pnt[1]);
+		ctx.lineTo(region[1][0], node.pnt[1]);
+		ctx.stroke();
+		if(node.nodes[0]!==null){
+			let r=regionClone(region);
+			r[1][1]=node.pnt[1];
+			drawNode2(ctx, node.nodes[0], r);
+		}
+		if(node.nodes[1]!==null){
+			let r=regionClone(region);
+			r[0][1]=node.pnt[1];
+			drawNode2(ctx, node.nodes[1], r);
+		}
+	}
+}// end #drawNode2()
 
 
 /* treeFindNearest()

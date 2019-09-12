@@ -9,7 +9,7 @@ Main-Object: KDTree
 
 (the following functions are 'static' as they do not access/need any tree-data)
 .minNode(dim,...nodes): finds node with smallest value in dimension 'dim'
-.mayNode(dim,...nodes): finds node with highest value in dimension 'dim'
+.maxNode(dim,...nodes): finds node with highest value in dimension 'dim'
 .pointDistance(p1,p2): returns distance of 2 points
 .rayRegionIntersection(ray, region); returns intersections of 'ray' with region
 
@@ -92,7 +92,7 @@ function KDTree(point, dimension){
 	/*
 	returns the node with the smallest value in dimension 'dimension'
 	*/
-	this.nodeMin=function(dimension, ...nodes){
+	this.minNode=function(dimension, ...nodes){
 		let n=0;
 		for(let i=1; i<nodes.length; i++) if(nodes[i][dimension]<nodes[n][dimension]) n=i;
 		return nodes[n];
@@ -101,11 +101,13 @@ function KDTree(point, dimension){
 	/*
 	returns the nodes with the highest value in dimension 'dimension'
 	*/
-	this.nodeMax=function(dimension, ...nodes){
+	this.maxNode=function(dimension, ...nodes){
 		let n=0;
 		for(let i=1; i<nodes.length; i++) if(nodes[i][dimension]>nodes[n][dimension]) n=i;
 		return nodes[n];
 	};
+
+
 
 	/*
 	Finds the node with the smalles value in dimension 'dimension' and returns it.

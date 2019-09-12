@@ -256,6 +256,43 @@ console.log("db: nodeMax(): this.pnt="+this.pnt);
 
 	};// end #rayRegionIntersection()
 
+	/*
+	return: true, if this node has no child nodes. false, otherwise
+	*/
+	this.isLeaf=function(){
+		return this.nodes[0]===null && this.nodes[1]===null;
+	};// end #isLeaf()
+
+
+	/*
+	tests if 2 points are equal
+	if 'p2' is undefined, the current point is assumed
+	*/
+	this.pointEqual=function(p1,p2){
+		if(typeof p2==="undefined") p2=this.pnt;
+		if(p1.length!=p2.length){
+			console.log("dimension mismatch");
+			return false;
+		}
+		for(let i=0; i<p1.length; i++) if(p1[i]!=p2[i]) return false;
+		return true;
+	};// end #pointEqual()
+
+	/*
+	Searches for 'point' _below_ this tree
+	return: [node, parent]: the 'node' representing 'point' and that nodes direct parent.
+	        If 'point' is not found, returns [null, parent], where 'parent' is
+			the node which should have represented 'point'.
+	*/
+	this.getNode=function(point){
+		let nodeIdx=(point[this.dim]>this.pnt[this.dim])?1:0;
+		if(this.nodes[nodeIdx]===null) return [null, this]; // not found, but this node could have been its parent
+		if(this.pointEqual(this.nodes[nodeIdx].pnt,point)) return [this.nodes[nodeIdx], this]; // found
+		return this.nodes[nodeIdx].getNode(point, this); // search deeper
+	};// end #getNode()
+
+
+
 }// end KDTree()
 
 /*function demo(){

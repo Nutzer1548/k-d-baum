@@ -3,8 +3,8 @@
 Object to bild an k-d-tree and operate on it.
 Main-Object: KDTree
 .add(point): adds 'point' to tree
+.nodeMin(dim): returns [node, parent] -> smallest node with parent
 .findNearestPoint(point, minDist): finds that point in tree, thats nearest to 'point' 
-.findMin(dim): returns node with smalest value along dimension 'dim'
 .findRegion(point, region): finds smallest region inside 'region' that contains 'point'
 
 (the following functions are 'static' as they do not access/need any tree-data)
@@ -110,12 +110,46 @@ function KDTree(point, dimension){
 
 
 	/*
-	Finds the node with the smalles value in dimension 'dimension' and returns it.
-	minNode: node with smallest value so far. if not defined: the current node is used
+	returns the node with the smallest value _below_ this node along 'dimension'
+	and returns it and its parent
+	return: [node, parent]: smallest 'node' belong this one and its 'parent'.
+	        [node, null], if there is no smaller node along dimension than this one.
 	*/
-	this.findMin=function(dimension, minNode){
-		if(typeof minNode==="undefined") minNode=this;
-		else minNode=this.nodeMin(minNode, this);
+	this.nodeMin=function(dimension, root){
+		if(typeof root==="undefined") root=null;
+console.log("db: nodeMin(): this.pnt="+this.pnt+", dim="+this.dim);
+		if(this.dim==dimension){
+			if(this.nodes[0]===null) return [this, root];
+			return this.nodes[0].nodeMin(dimension, this);
+		}
+
+		if(this.isLeaf) return [this, root];
+
+		let minA=null, minAroot=null;
+		let minB=null, minBroot=null;
+		if(this.nodes[0]!==null){
+			[minA, minAroot]=this.nodes[0].nodeMin(dimension, this);
+		}
+		if(this.nodes[1]!==null){
+			[minB, minBroot]=this.nodes[1].nodeMin(dimension, this);
+		}
+
+		if(minB===null){
+			if(this.pnt[dimension]<minA.pnt[dimension]) return [this, root];
+			return [minA, minAroot];
+		}else if(minA===null){
+			if(this.pnt[dimension]<minB.pnt[dimension]) return [this, root];
+			return [minB, minBroot];
+		}
+
+		if(minB.pnt[dimension]<minA.pnt[dimension]){
+			minA=minB;
+			minAroot=minBroot;
+		}
+		
+		if(this.pnt[dimension]<minA.pnt[dimension]) return [this,root];
+		return [minA, minAroot];
+	};// end #nodeMin()
 
 		if(this.nodes[0]!==null) minNode=this.nodes[0].findMin(dimension, minNode);
 		if(this.dim!=dimension){

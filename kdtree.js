@@ -265,6 +265,39 @@ console.log("db: nodeMax(): this.pnt="+this.pnt);
 
 
 	/*
+	removes 'point' from this tree.
+	return: true if successful, false otherwise
+	*/
+	this.removePoint=function(point){
+console.log("db: removePoint():"+point);
+		let node, nodeRoot;
+		[node, nodeRoot]=this.getNode(point);
+		if(node===null) return false; // point not found
+		if(node.isLeaf()){ // remove link from parent and return
+			nodeRoot.nodes[node.pnt[nodeRoot.dim]>nodeRoot.pnt[nodeRoot.dim]?1:0]=null;
+			return true;
+		}
+
+		if(node.nodes[1]!==null){
+			let min,minRoot;
+			[min, minRoot]=node.nodeMin(node.dim);
+			if(minRoot===null){ // => min=node => minRoot=nodeRoot
+				minRoot=nodeRoot;
+			}
+			node.pnt=min.pnt.slice();
+			return minRoot.removePoint(node.pnt);
+		}
+
+		if(node.nodes[0]!==null){
+			let max, maxRoot;
+			[max, maxRoot]=node.nodeMax(node.dim);
+			if(maxRoot===null) maxRoot=nodeRoot;
+			node.pnt=max.pnt.slice();
+			return maxRoot.removePoint(node.pnt);
+		}
+	};// end #removePoint()
+
+	/*
 	tests if 2 points are equal
 	if 'p2' is undefined, the current point is assumed
 	*/

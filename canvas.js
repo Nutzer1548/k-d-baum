@@ -19,6 +19,7 @@ let crossPath=null;
 
 let selectedPoint={
 	point: null,
+	mouse: null,
 	radius: 10
 };
 let selRect=null;
@@ -112,6 +113,11 @@ function draw(){
 		ctx.strokeStyle="rgba(255,0,0,0.75)";
 		ctx.beginPath();
 		let p=selectedPoint.point;
+		ctx.arc(p.x, p.y, 4, 0, 2*Math.PI);
+		ctx.stroke();
+		ctx.strokeStyle="rgba(200,0,100,0.5)";
+		ctx.beginPath();
+		p=selectedPoint.mouse;
 		ctx.arc(p.x, p.y, selectedPoint.radius, 0, 2*Math.PI);
 		ctx.stroke();
 	}

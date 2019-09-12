@@ -151,13 +151,44 @@ console.log("db: nodeMin(): this.pnt="+this.pnt+", dim="+this.dim);
 		return [minA, minAroot];
 	};// end #nodeMin()
 
-		if(this.nodes[0]!==null) minNode=this.nodes[0].findMin(dimension, minNode);
-		if(this.dim!=dimension){
-			if(this.nodes[1]!==null) minVal=this.nodes[1].findMin(dimension, minNode);
+	/*
+	returns the nodes with the highest value in dimension 'dimension'
+	*/
+	this.nodeMax=function(dimension, root ){
+		if(typeof root==="undefined") root=null;
+console.log("db: nodeMax(): this.pnt="+this.pnt);
+		if(this.dim==dimension){
+			if(this.nodes[0]===null) return [this, root];
+			return this.nodes[0].nodeMax(dimension, this);
+		}
+		
+		if(this.isLeaf) return [this, root];
+
+		let maxA=null, maxAroot=null;
+		let maxB=null, maxBroot=null;
+		if(this.nodes[0]!==null){
+			[maxA, maxAroot]=this.nodes[0].nodeMax(dimension, this);
+		}
+		if(this.nodes[1]!==null){
+			[maxB, maxBroot]=this.nodes[1].nodeMax(dimension, this);
 		}
 
-		return minNode;
-	};// end #findMin()
+		if(maxB===null){
+			if(this.pnt[dimension]>maxA.pnt[dimension]) return [this, root];
+			return [maxA, maxAroot];
+		}else if(maxA===null){
+			if(this.pnt[dimension]>maxB.pnt[dimension]) return [this, root];
+			return [maxB, maxBroot];
+		}
+
+		if(maxB.pnt[dimension]>maxA.pnt[dimension]){
+			maxA=maxB;
+			maxAroot=maxBroot;
+		}
+		
+		if(this.pnt[dimension]>maxA.pnt[dimension]) return [this,root];
+		return [maxA, maxAroot];
+	};// end #nodeMax()
 
 
 	/*

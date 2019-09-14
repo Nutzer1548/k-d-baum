@@ -119,8 +119,8 @@ function KDTree(point, dimension){
 
 	/*
 	returns the node with the smallest value _below_ this node along 'dimension'
-	and returns it and its parent
-	return: [node, parent]: smallest 'node' belong this one and its 'parent'.
+	and returns it and its parent. 
+	return: [node, parent]: smallest 'node' below this one and its 'parent'.
 	        [node, null], if there is no smaller node along dimension than this one.
 	*/
 	this.nodeMin=function(dimension, root){
@@ -130,7 +130,7 @@ function KDTree(point, dimension){
 			return this.nodes[0].nodeMin(dimension, this);
 		}
 
-		if(this.isLeaf) return [this, root];
+		if(this.isLeaf()) return [this, root];
 
 		let minA=null, minAroot=null;
 		let minB=null, minBroot=null;
@@ -141,11 +141,12 @@ function KDTree(point, dimension){
 			[minB, minBroot]=this.nodes[1].nodeMin(dimension, this);
 		}
 
-		if(minB===null){
-			if(this.pnt[dimension]<minA.pnt[dimension]) return [this, root];
+		if(minB===null){// -> compare 'minA' with 'this'
+			if(this.pnt[dimension]<=minA.pnt[dimension]) return [this, root];
 			return [minA, minAroot];
-		}else if(minA===null){
-			if(this.pnt[dimension]<minB.pnt[dimension]) return [this, root];
+		}
+		if(minA===null){// -> compare 'minB' with 'this'
+			if(this.pnt[dimension]<=minB.pnt[dimension]) return [this, root];
 			return [minB, minBroot];
 		}
 
@@ -154,21 +155,21 @@ function KDTree(point, dimension){
 			minAroot=minBroot;
 		}
 		
-		if(this.pnt[dimension]<minA.pnt[dimension]) return [this,root];
+		if(this.pnt[dimension]<=minA.pnt[dimension]) return [this,root];
 		return [minA, minAroot];
-	};// end #nodeMin()
+	};//end #nodeMin()
 
 	/*
-	returns the nodes with the highest value in dimension 'dimension'
+	Like nodeMin(), but finds the node with the highest value
 	*/
 	this.nodeMax=function(dimension, root ){
 		if(typeof root==="undefined") root=null;
 		if(this.dim==dimension){
-			if(this.nodes[0]===null) return [this, root];
-			return this.nodes[0].nodeMax(dimension, this);
+			if(this.nodes[1]===null) return [this, root];
+			return this.nodes[1].nodeMax(dimension, this);
 		}
 		
-		if(this.isLeaf) return [this, root];
+		if(this.isLeaf()) return [this, root];
 
 		let maxA=null, maxAroot=null;
 		let maxB=null, maxBroot=null;
@@ -180,10 +181,10 @@ function KDTree(point, dimension){
 		}
 
 		if(maxB===null){
-			if(this.pnt[dimension]>maxA.pnt[dimension]) return [this, root];
+			if(this.pnt[dimension]>=maxA.pnt[dimension]) return [this, root];
 			return [maxA, maxAroot];
 		}else if(maxA===null){
-			if(this.pnt[dimension]>maxB.pnt[dimension]) return [this, root];
+			if(this.pnt[dimension]>=maxB.pnt[dimension]) return [this, root];
 			return [maxB, maxBroot];
 		}
 
@@ -191,8 +192,8 @@ function KDTree(point, dimension){
 			maxA=maxB;
 			maxAroot=maxBroot;
 		}
-		
-		if(this.pnt[dimension]>maxA.pnt[dimension]) return [this,root];
+
+		if(this.pnt[dimension]>=maxA.pnt[dimension]) return [this,root];
 		return [maxA, maxAroot];
 	};// end #nodeMax()
 

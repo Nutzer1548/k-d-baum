@@ -41,13 +41,13 @@ function KDTree(point, dimension){
 	return: the newly created node which represent 'point'.
 	*/
 	this.add=function(point){
-		if(point.length!=point.length){// dimension mismatch
+		if(this.pnt.length!=point.length){// dimension mismatch
 			console.log("Error: Dimension mismatch!");
 			return null; 
 		}
 		let nodeIdx=0;
 		if(point[this.dim]>this.pnt[this.dim]) nodeIdx=1;
-		if(this.nodes[nodeIdx]==null) this.nodes[nodeIdx]=new KDTree(point, (this.dim+1)%point.length);
+		if(this.nodes[nodeIdx]==null) this.nodes[nodeIdx]=new KDTree(point, (this.dim+1)%this.pnt.length);
 		else return this.nodes[nodeIdx].add( point);//, (  this.dim+1)%point.length);
 		return this.nodes[nodeIdx];
 	};// end #add();

@@ -74,7 +74,7 @@ if(true)return; // */
 		let points=Array(numMax);
 		for(let num=0; num<numMax; num++){
 			let pnt=Array(dim);
-			//for(let d=0; d<dim; d++) pnt[d]=Math.random();
+//			for(let d=0; d<dim; d++) pnt[d]=Math.random();
 			for(let d=0; d<dim; d++) pnt[d]=Number.parseInt(Math.random()*100);
 			points[num]=pnt;
 		}
@@ -85,11 +85,11 @@ if(true)return; // */
 	everthing:function(){
 		this.errorsFound=0;
 		console.log("Testing everything:");
-		this.createPoints(11,1000);
+		this.createPoints(13,10000);
 		this.add();
 		this.uniformDimensions();
 		this.minMax();
-		//this.remove(); // <--- ERRORS
+		this.remove(); 
 		console.log("Done with everything. Errors found: "+this.errorsFound);
 	},// end everything()
 
@@ -153,9 +153,11 @@ if(true)return; // */
 	},// end #minMax()
 	
 	/* tests removal of points */
+db_toRemove:[],
 	remove:function(){
 		let pointsToRemoveMax=Number.parseInt(this.points.length*0.02);
 		let pointsToRemove=Array(pointsToRemoveMax);
+this.db_roRemove=pointsToRemove;
 console.log("db: removing "+pointsToRemoveMax+" points")
 		for(let i=0; i<pointsToRemoveMax; i++){
 			let idx;
@@ -167,7 +169,7 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 
 		for(let i=0; i<pointsToRemoveMax; i++){
 			let p=this.points[pointsToRemove[i]];
-console.log("i="+i+" "+p);
+//console.log("i="+i+" "+p);
 			let ret=this.tree.removePoint(p);
 			if(ret!==true){
 				console.log("remove(): can't remove point "+p+" (global idx "+pointsToRemove[i]+", local idx "+i+")");

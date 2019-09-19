@@ -85,8 +85,9 @@ if(true)return; // */
 	everthing:function(){
 		this.errorsFound=0;
 		console.log("Testing everything:");
-		this.createPoints(13,10000);
+		this.createPoints(3,1000);
 		this.add();
+		this.structure();
 		this.uniformDimensions();
 		this.minMax();
 		this.remove(); 
@@ -116,6 +117,29 @@ if(true)return; // */
 			this.uniformDimensions(node.nodes[1]);
 		}
 	},// end #uniformDimensions()
+
+	/* tests internal structure of 'tree'
+	-> tests if every child is placed on the correct side.
+	*/
+	structure:function(root){
+		if(typeof root==="undefined") root=Test.tree;
+
+		if(root.nodes[0]!==null){
+			if(root.nodes[0].pnt[root.dim]>root.pnt[root.dim]){
+				this.errorsFound++;
+				console.log("structure(): child not correctly positioned!\n'-> dim="+root.dim+" | root:"+root.pnt+" | nodes[0]:"+root.nodes[0].pnt);
+			}
+			this.structure(root.nodes[0]);
+		}
+		if(root.nodes[1]!==null){
+			if(root.nodes[1].pnt[root.dim]<=root.pnt[root.dim]){
+				this.errorsFound++;
+				console.log("structure(): child not correctly positioned!\n'-> dim="+root.dim+" | root:"+root.pnt+" | nodes[1]:"+root.nodes[1].pnt);
+			}
+			this.structure(root.nodes[1]);
+		}
+		
+	},// end #structure
 
 	/* tests tree.nodeMin/.nodeMax */
 	minMax:function(){

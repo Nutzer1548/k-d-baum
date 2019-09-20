@@ -16,7 +16,7 @@ let Test={
 
 	/* adds point in a tree and tries to find them afterwards */
 	add:function(){
-		console.log("Test.add() --- start");
+		//console.log("Test.add() --- start");
 
 		let points=this.points;
 		let dim=this.points[0].length;
@@ -57,7 +57,7 @@ let Test={
 
 		}// end for num
 
-		console.log("Test.add() --- end");
+		//console.log("Test.add() --- end");
 	},// end #add()
 
 	/* creates points for testing the tree with */
@@ -93,6 +93,25 @@ if(true)return; // */
 		this.remove(); 
 		console.log("Done with everything. Errors found: "+this.errorsFound);
 	},// end everything()
+
+
+	/* test tree building */
+	testBuilding:function(dimensions, pointCount, loops){
+		if(typeof dimensions==="undefined") dimensions=3;
+		if(typeof pointCount==="undefined") pointCount=1000;
+		if(typeof loops==="undefined") loops=50;
+		this.errorsFound=0;
+		console.log("Testing tree building:");
+		for(let l=0; l<loops; l++){
+			this.createPoints(dimensions, pointCount);
+			this.add();
+			this.structure();
+			this.uniformDimensions();
+			this.minMax();
+		}// end for l
+		this.createPoints(dimensions, pointCount,);
+		console.log("Test done. Errors found: "+this.errorsFound);
+	},// end #testBuilding()
 
 
 	/* tests for correctly alterd splitting dimension */
@@ -143,7 +162,7 @@ if(true)return; // */
 
 	/* tests tree.nodeMin/.nodeMax */
 	minMax:function(){
-		console.log("Test.minMax -- start");
+		//console.log("Test.minMax -- start");
 		let node, root;
 		[node, root]=this.tree.nodeMin(0);
 		let pointMin, pointMax;
@@ -173,15 +192,16 @@ if(true)return; // */
 				console.log("minMax(): maximum in dimension "+d+" should be "+pointMax+" but returned was "+node.pnt);
 			}
 		}// end for d
-		console.log("Test.minMax -- end");
+		//console.log("Test.minMax -- end");
 	},// end #minMax()
 	
 	/* tests removal of points */
 db_toRemove:[],
 	remove:function(){
 		let pointsToRemoveMax=Number.parseInt(this.points.length*0.02);
+pointsToRemoveMax=1;
 		let pointsToRemove=Array(pointsToRemoveMax);
-this.db_roRemove=pointsToRemove;
+this.db_toRemove=pointsToRemove;
 console.log("db: removing "+pointsToRemoveMax+" points")
 		for(let i=0; i<pointsToRemoveMax; i++){
 			let idx;

@@ -116,10 +116,43 @@ function KDTree(point, dimension){
 	};
 
 
+	/*
+	Like nodeMin(), but returns a list of all nodes with the same minimal value
+	in 'dimension' and the minimum itself.
+	return: [nodeList, minimum]
+	nodelist: [[node, nodeRoot, ],...]
+	*/
+	this.nodeMinList=function(dimension, root, depth){
+		if(typeof root==="undefined") root=null;
+		if(typeof depth==="undefined") depth=1;
+		let list=[[[this, root, depth]], this.pnt[dimension]];
+		if(this.nodes[0]!==null){
+			let ret=this.nodes[0].nodeMinList(dimension, this, depth+1);
+			if(ret[1]==list[1]){
+				list[0]=list[0].concat(ret[0]);
+				list[1]=ret[1];
+			}else if(ret[1]<list[1]) list=ret;
+		}
+		if(this.nodes[1]!==null){
+			let ret=this.nodes[1].nodeMinList(dimension, this, depth+1);
+			if(ret[1]==list[1]){
+				list[0]=list[0].concat(ret[0]);
+				list[1]=ret[1];
+			}else if(ret[1]<list[1]) list=ret;
+		}
+		list[0].sort(function(a,b){
+			return a[2]-b[2];
+		});
+		return list;
+	};// end #nodeMinList()
+
 
 	/*
 	returns the node with the smallest value _below_ this node along 'dimension'
 	and returns it and its parent. 
+	parameter:
+	dimension: the relevant dimension for finding the minimum along
+	root: the direct parent of this node, will be 'null' if undefined.
 	return: [node, parent]: smallest 'node' below this one and its 'parent'.
 	        [node, null], if there is no smaller node along dimension than this one.
 	*/

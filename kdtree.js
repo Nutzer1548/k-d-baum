@@ -322,12 +322,13 @@ function KDTree(point, dimension){
 	Searches for 'point' _below_ this tree
 	return: [node, parent]: the 'node' representing 'point' and that nodes direct parent.
 	        If 'point' is not found, returns [null, parent], where 'parent' is
-			the node which should have represented 'point'.
+			the node which should have been parent for 'point'.
 	*/
 	this.getNode=function(point){
 		let nodeIdx=(point[this.dim]>this.pnt[this.dim])?1:0;
 		if(this.nodes[nodeIdx]===null) return [null, this]; // not found, but this node could have been its parent
-		if(this.pointEqual(this.nodes[nodeIdx].pnt,point)) return [this.nodes[nodeIdx], this]; // found
+		if(this.nodes[nodeIdx].pointEqual(point)) return [this.nodes[nodeIdx], this]; // found
+		//if(this.pointEqual(this.nodes[nodeIdx].pnt,point)) return [this.nodes[nodeIdx], this]; // found
 		return this.nodes[nodeIdx].getNode(point, this); // search deeper
 	};// end #getNode()
 

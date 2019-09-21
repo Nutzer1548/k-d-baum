@@ -120,7 +120,7 @@ function KDTree(point, dimension){
 	Like nodeMin(), but returns a list of all nodes with the same minimal value
 	in 'dimension' and the minimum itself.
 	return: [nodeList, minimum]
-	nodelist: [[node, nodeRoot, ],...]
+	nodelist: [[node, nodeRoot, depth],...]
 	*/
 	this.nodeMinList=function(dimension, root, depth){
 		if(typeof root==="undefined") root=null;
@@ -141,7 +141,7 @@ function KDTree(point, dimension){
 			}else if(ret[1]<list[1]) list=ret;
 		}
 		list[0].sort(function(a,b){
-			return a[2]-b[2];
+			return b[2]-a[2];
 		});
 		return list;
 	};// end #nodeMinList()
@@ -305,85 +305,76 @@ function KDTree(point, dimension){
 
 
 	/*
+	Removes this node
+	*/
+	this.remove=function(root){
+		if(typeof root==="undefined"){
+			console.log("Error: root not defined!");
+			return false;
+		}
+		if(root===null){
+			console.log("Error: root is null!");
+			return false;
+		}
+
+		if(this.isLeaf()){
+			if(root.nodes[0]!==null){
+				if(root.nodes[0].pointEqual(this.pnt)){
+					root.nodes[0]=null;
+					return true;
+				}
+			}
+			if(root.nodes[1]!==null){
+				if(root.nodes[1].pointEqual(this.pnt)){
+					root.nodes[1]=null;
+					return true;
+				}
+			}
+			console.log("Error: root of leaf is not root of leaf!");
+			return false;
+		}
+
+		if(this.nodes[1]!==null){
+			let nodeList, minVal, ret;
+			[nodeList, minVal]=this.nodes[1].nodeMinList(this.dim, this, 1);
+
+			this.pnt=nodeList[0][0].pnt.slice();
+			ret=nodeList[0][0].remove(nodeList[0][1]);
+			if(!ret) return false;
+
+			for(let i=1; i<nodeList.length; i++){
+				this.add(nodeList[i][0].pnt);
+				ret=nodeList[i][0].remove(nodeList[i][1]);
+				if(!ret) return false;
+			}
+			return true;
+		}
+
+		if(this.nodes[0]!==null){
+			let minNode, minRoot, ret;
+			[minNode, minRoot]=this.nodes[0].nodeMax(this.dim, this);
+
+			this.pnt=minNode.pnt.slice();
+			ret=minNode.remove(minRoot);
+			if(!ret) return false;
+		}
+
+
+		return true;
+	};// end #remove()
+
+
+	/*
 	removes 'point' from this tree.
 	return: true if successful, false otherwise
 	*/
 	this.removePoint=function(point){
-		
 		// find node to delete
 		let node=null, nodeRoot;
 		[node, nodeRoot]=this.getNode(point);
+if(node===null) console.log("removePoint(): can't find node with point "+point);
 		if(node===null) return false; // point not found
-
-		while(true){
-			if(node.isLeaf()){ // remove link from parent and return
-				let nodeIdx=(node.pnt[nodeRoot.dim]>nodeRoot.pnt[nodeRoot.dim])?1:0;
-				nodeRoot.nodes[nodeIdx]=null;
-				return true;
-			}
-
-
-			if(node.nodes[1]!==null){
-				// find minimum of right side
-				let min, minRoot;
-				//[min, minRoot]=node.nodes[1].nodeMin(node.dim, node);
-				[min, minRoot]=node.nodes[1].nodeMin(node.dim);
-/*if(node.nodes[1].pointEqual(min.pnt)){
-	console.log("ERR: X.nodeMin==X !!!");
-	return false;
-}// */
-				
-				// correct minimum, if nodes[1] is smaller
-if(minRoot===null){
-	min=node.nodes[1];
-	minRoot=node;
-}
-/*
-				if(node.nodes[1].pnt[node.dim]<=min.pnt[node.dim]){
-					min=node.nodes[1];
-					minRoot=node;
-				}
-// */
-				
-				// replace 'node' with 'min'imum
-				node.pnt=min.pnt.slice();
-
-				// make minimum the new node to delete
-				node=min;
-				nodeRoot=minRoot;
-				continue;
-			}// end if nodes[1]
-
-			if(node.nodes[0]!==null){
-				// find maximum of left side
-				let max, maxRoot;
-				[max, maxRoot]=node.nodes[0].nodeMax(node.dim, node);
-/*if(node.nodes[0].pointEqual(max.pnt)){
-	console.log("ERR: X.nodeMax==X !!!");
-	return false;
-}// */
-
-				// correct maximum, if nodes[0] is greater
-//				if(node.nodes[0].pnt[node.dim]>=max.pnt[node.dim]){
-				if(maxRoot===null){
-					max=node.nodes[0];
-					maxRoot=node;
-				}
-
-				// replace 'node' with 'max'imum
-				node.pnt=max.pnt.slice();
-
-				// make maximum the new node to delete
-				node=max;
-				nodeRoot=maxRoot;
-				continue;
-			}// end if nodes[0]
-
-console.log("unreachable state?!");
-break;
-		}// end while
-console.log(":: givenUp");
-		return false;
+		return node.remove(nodeRoot);
 	};// end #removePoint()
 
 	/*

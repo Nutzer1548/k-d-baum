@@ -220,6 +220,34 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 				this.errorsFound++;
 			}
 		}
+
+		// tests if every point that should be in tree is there
+		// and every point that should not, is not
+		for(let num=0; num<this.points.length; num++){
+			// is point found in tree?
+			let node, root;
+			[node, root]=this.tree.getNode(this.points[num]);
+			let found=true;
+			if(node===null){
+				if(this.tree.pointEqual(this.points[num])){
+					// root-node
+					found=true;
+				}else found=false;
+			}
+
+			// is that result expected?
+			if(pointsToRemove.indexOf(num)>=0){
+				if(found){
+					this.errorsFound++;
+					console.log("point "+this.points[num]+" should have been removed, but is still there!");
+				}
+			}else if(!found){
+				this.errorsFound++;
+				console.log("point "+this.points[num]+" is missing!");
+			}
+
+
+		}// end for num
 	},// end #remove()
 
 	

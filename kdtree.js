@@ -276,31 +276,81 @@ function KDTree(point, dimension){
 	return: true if successful, false otherwise
 	*/
 	this.removePoint=function(point){
-		let node, nodeRoot;
+		
+		// find node to delete
+		let node=null, nodeRoot;
 		[node, nodeRoot]=this.getNode(point);
 		if(node===null) return false; // point not found
-		if(node.isLeaf()){ // remove link from parent and return
-			nodeRoot.nodes[node.pnt[nodeRoot.dim]>nodeRoot.pnt[nodeRoot.dim]?1:0]=null;
-			return true;
-		}
 
-		if(node.nodes[1]!==null){
-			let min,minRoot;
-			[min, minRoot]=node.nodeMin(node.dim);
-			if(minRoot===null){ // => min=node => minRoot=nodeRoot
-				minRoot=nodeRoot;
+		while(true){
+			if(node.isLeaf()){ // remove link from parent and return
+				let nodeIdx=(node.pnt[nodeRoot.dim]>nodeRoot.pnt[nodeRoot.dim])?1:0;
+				nodeRoot.nodes[nodeIdx]=null;
+				return true;
 			}
-			node.pnt=min.pnt.slice();
-			return minRoot.removePoint(node.pnt);
-		}
 
-		if(node.nodes[0]!==null){
-			let max, maxRoot;
-			[max, maxRoot]=node.nodeMax(node.dim);
-			if(maxRoot===null) maxRoot=nodeRoot;
-			node.pnt=max.pnt.slice();
-			return maxRoot.removePoint(node.pnt);
-		}
+
+			if(node.nodes[1]!==null){
+				// find minimum of right side
+				let min, minRoot;
+				//[min, minRoot]=node.nodes[1].nodeMin(node.dim, node);
+				[min, minRoot]=node.nodes[1].nodeMin(node.dim);
+/*if(node.nodes[1].pointEqual(min.pnt)){
+	console.log("ERR: X.nodeMin==X !!!");
+	return false;
+}// */
+				
+				// correct minimum, if nodes[1] is smaller
+if(minRoot===null){
+	min=node.nodes[1];
+	minRoot=node;
+}
+/*
+				if(node.nodes[1].pnt[node.dim]<=min.pnt[node.dim]){
+					min=node.nodes[1];
+					minRoot=node;
+				}
+// */
+				
+				// replace 'node' with 'min'imum
+				node.pnt=min.pnt.slice();
+
+				// make minimum the new node to delete
+				node=min;
+				nodeRoot=minRoot;
+				continue;
+			}// end if nodes[1]
+
+			if(node.nodes[0]!==null){
+				// find maximum of left side
+				let max, maxRoot;
+				[max, maxRoot]=node.nodes[0].nodeMax(node.dim, node);
+/*if(node.nodes[0].pointEqual(max.pnt)){
+	console.log("ERR: X.nodeMax==X !!!");
+	return false;
+}// */
+
+				// correct maximum, if nodes[0] is greater
+//				if(node.nodes[0].pnt[node.dim]>=max.pnt[node.dim]){
+				if(maxRoot===null){
+					max=node.nodes[0];
+					maxRoot=node;
+				}
+
+				// replace 'node' with 'max'imum
+				node.pnt=max.pnt.slice();
+
+				// make maximum the new node to delete
+				node=max;
+				nodeRoot=maxRoot;
+				continue;
+			}// end if nodes[0]
+
+console.log("unreachable state?!");
+break;
+		}// end while
+console.log(":: givenUp");
+		return false;
 	};// end #removePoint()
 
 	/*

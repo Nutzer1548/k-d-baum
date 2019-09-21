@@ -157,25 +157,29 @@ if(true)return; // */
 
 	/* tests internal structure of 'tree'
 	-> tests if every child is placed on the correct side.
+	return: the count of errors found.
 	*/
 	structure:function(root){
 		if(typeof root==="undefined") root=Test.tree;
+		let err=0;
 
 		if(root.nodes[0]!==null){
 			if(root.nodes[0].pnt[root.dim]>root.pnt[root.dim]){
 				this.errorsFound++;
 				console.log("structure(): child not correctly positioned!\n'-> dim="+root.dim+" | root:"+root.pnt+" | nodes[0]:"+root.nodes[0].pnt);
+				err++;
 			}
-			this.structure(root.nodes[0]);
+			err+=this.structure(root.nodes[0]);
 		}
 		if(root.nodes[1]!==null){
 			if(root.nodes[1].pnt[root.dim]<=root.pnt[root.dim]){
 				this.errorsFound++;
 				console.log("structure(): child not correctly positioned!\n'-> dim="+root.dim+" | root:"+root.pnt+" | nodes[1]:"+root.nodes[1].pnt);
+				err++;
 			}
-			this.structure(root.nodes[1]);
+			err+=this.structure(root.nodes[1]);
 		}
-		
+		return err;
 	},// end #structure
 
 	/* tests tree.nodeMin/.nodeMax */

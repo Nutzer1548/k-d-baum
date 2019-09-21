@@ -221,55 +221,53 @@ if(true)return; // */
 db_toRemove:[],
 	remove:function(){
 		let pointsToRemoveMax=Number.parseInt(this.points.length*0.02);
-pointsToRemoveMax=1;
+//pointsToRemoveMax=1;
 		let pointsToRemove=Array(pointsToRemoveMax);
 this.db_toRemove=pointsToRemove;
 console.log("db: removing "+pointsToRemoveMax+" points")
+
+
 		for(let i=0; i<pointsToRemoveMax; i++){
+			// pick an existing point to remove (by index)
 			let idx;
 			do{
 				idx=Number.parseInt(Math.random()*(this.points.length-1))+1;
 			}while(pointsToRemove.indexOf(idx)>=0);
 			pointsToRemove[i]=idx;
-		}
 
-		for(let i=0; i<pointsToRemoveMax; i++){
-			let p=this.points[pointsToRemove[i]];
-//console.log("i="+i+" "+p);
-			let ret=this.tree.removePoint(p);
+			let p=this.points[idx]; // point to remove
+			let ret=this.tree.removePoint(p); // remove
 			if(ret!==true){
-				console.log("remove(): can't remove point "+p+" (global idx "+pointsToRemove[i]+", local idx "+i+")");
 				this.errorsFound++;
-			}
-		}
-
-		// tests if every point that should be in tree is there
-		// and every point that should not, is not
-		for(let num=0; num<this.points.length; num++){
-			// is point found in tree?
-			let node, root;
-			[node, root]=this.tree.getNode(this.points[num]);
-			let found=true;
-			if(node===null){
-				if(this.tree.pointEqual(this.points[num])){
-					// root-node
-					found=true;
-				}else found=false;
+				console.log("remove(): can't remove point "+p+" (global idx "+idx+", local idx "+i+")\n...aborting");
+				return;
 			}
 
-			// is that result expected?
-			if(pointsToRemove.indexOf(num)>=0){
-				if(found){
+			if(0!=this.structure()){
+				console.log("damaged structure after removal of "+(i+1)+" point(s)\n...aborting");
+				return;
+			}
+
+			// tests if every point that should be in tree is there
+			// and every point that should not, is not
+			for(let num=0; num<this.points.length; num++){
+				let node, root, inTree=true;
+				[node, root]=this.tree.getNode(this.points[num]);
+
+				if(num==0) inTree=this.tree.pointEqual(this.points[0]);
+				else inTree=(node!=null);
+
+				if(pointsToRemove.indexOf(num)>=0){// should be removed
+					if(inTree){
+						this.errorsFound++;
+						console.log("point "+this.points[num]+" should have been removed, but is still there!");
+					}
+				}else if(!inTree){
 					this.errorsFound++;
-					console.log("point "+this.points[num]+" should have been removed, but is still there!");
+					console.log("point "+this.points[num]+" is missing.");
 				}
-			}else if(!found){
-				this.errorsFound++;
-				console.log("point "+this.points[num]+" is missing!");
-			}
-
-
-		}// end for num
+			}// end for num
+		}// end for i
 	},// end #remove()
 
 	

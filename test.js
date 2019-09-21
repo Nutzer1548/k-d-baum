@@ -109,7 +109,7 @@ if(true)return; // */
 			this.uniformDimensions();
 			this.minMax();
 		}// end for l
-		this.createPoints(dimensions, pointCount,);
+	//	this.createPoints(dimensions, pointCount,);
 		console.log("Test done. Errors found: "+this.errorsFound);
 	},// end #testBuilding()
 

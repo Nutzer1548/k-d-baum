@@ -60,6 +60,24 @@ let Test={
 		//console.log("Test.add() --- end");
 	},// end #add()
 
+	/*
+	Checks if every point in 'points' is in the tree.
+	Returns the missing Points
+	*/
+	findMissingPoints:function(){
+		let ret=[];
+		for(let i=0; i<this.points.length; i++){
+			let node, nodeRoot;
+			if(i==0){
+				if(!this.tree.pointEqual(this.points[i])) ret.push(this.points[0]);
+				continue;
+			}
+			[node, nodeRoot]=this.tree.getNode(this.points[i]);
+			if(node===null) ret.push(this.points[i]);
+		}
+		return ret;
+	},// end #findMissingPoints()
+
 	/* creates points for testing the tree with */
 	createPoints:function(dimensions, maxPoints){
 		if(typeof dimensions==="undefined") dimensions=3;

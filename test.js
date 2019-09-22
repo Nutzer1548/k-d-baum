@@ -83,9 +83,6 @@ let Test={
 		if(typeof dimensions==="undefined") dimensions=3;
 		if(typeof maxPoints==="undefined") maxPoints=200;
 
-// DB:
-/*this.points=JSON.parse("[[39,96,37],[50,97,40],[18,1,69],[69,96,13],[0,20,80],[26,29,79],[72,67,69],[14,95,97],[22,70,97],[6,57,20]]");
-if(true)return; // */
 		// create points
 		let dim=dimensions; // dimensions for points
 		let numMax=maxPoints; // points to create
@@ -250,6 +247,7 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 
 			// tests if every point that should be in tree is there
 			// and every point that should not, is not
+			let err=0;
 			for(let num=0; num<this.points.length; num++){
 				let node, root, inTree=true;
 				[node, root]=this.tree.getNode(this.points[num]);
@@ -261,12 +259,18 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 					if(inTree){
 						this.errorsFound++;
 						console.log("point "+this.points[num]+" should have been removed, but is still there!");
+						err++;
 					}
 				}else if(!inTree){
 					this.errorsFound++;
 					console.log("point "+this.points[num]+" is missing.");
+					err++;
 				}
 			}// end for num
+			if(err>0){
+				console.log("'-> Point-Errors: "+err+" [i="+i+", idx="+idx+"].\n...aborting");
+				return;
+			}
 		}// end for i
 	},// end #remove()
 

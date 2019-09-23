@@ -1,12 +1,29 @@
 "use strict";
-/*
-functions for testing kdtree.js
-call "Test.everything()" for a complete test.
+/* functions for testing kdtree.js
+short:
+call "Test.everything(7,10000)" for a complete test over 7 dimensions with 10000 points.
+Every Test will log the errors found to the console.
 
-everything() tests:
-- adding many multidimensional points
-- finding every point
-- uniforme dimension splits (splitting axis is (current_dim+1)%max_dim from one node to its child)
+Base Object: Test
+
+Fields:
+-------
+.errorsFound: count of errors found
+.points: [] the points, that will be in the kdtree
+.tree: the kdtree object the tests work on
+
+Functions:
+----------
+.add(): adds the points in the 'points' field to tbhe kdtree and ensures they are there
+.findMissingPoints(): returns points in '.points' that are not in '.tree'
+.createPoints(dim,cnt): fills '.points' with 'cnt' random points with 'dim' dimensions
+.everything(dim,cnt): runs all tests using 'cnt' points with 'dim' dimensions
+.testBuilding(dim,cnt,loop): tests insertion of 'cnt' points with dimension 'dim', 'loop' times
+.uniformDimensions(node): tests 'node' and its children for alternating splitting dimension.
+.structure(node): tests if children of 'node' are placed on the correct side.
+.minMax(): tests if .tree.nodeMin()/.nodeMax() returns correct values
+.remove(): tests removal of points
+
 */
 
 let Test={
@@ -56,8 +73,6 @@ let Test={
 			}
 
 		}// end for num
-
-		//console.log("Test.add() --- end");
 	},// end #add()
 
 	/*
@@ -96,11 +111,16 @@ let Test={
 		this.points=points;
 	},// end #createPoints()
 	
-	/* runs all tests available in meaningful order*/
-	everthing:function(){
+	/* runs all tests available in meaningful order
+	dimensions: dimensions to simulate. defaults to 3
+	pointCount: the amount of points to create. defaults to 1000
+	*/
+	everthing:function(dimensions, pointCount){
+		if(typeof dimensions==="undefined") dimensions=3;
+		if(typeof pointCount==="undefined") pointCount=1000;
 		this.errorsFound=0;
 		console.log("Testing everything:");
-		this.createPoints(3,1000);
+		this.createPoints(dimensions, pointCount);
 		this.add();
 		this.structure();
 		this.uniformDimensions();
@@ -110,7 +130,11 @@ let Test={
 	},// end everything()
 
 
-	/* test tree building */
+	/* test tree building
+	dimensions: dimensions to simulate. defaults to 3
+	pointCount: the amount of points to create. defaults to 1000
+	loops: the complete test is repeated 'loops' times. defaults to 50.
+	*/
 	testBuilding:function(dimensions, pointCount, loops){
 		if(typeof dimensions==="undefined") dimensions=3;
 		if(typeof pointCount==="undefined") pointCount=1000;
@@ -124,7 +148,6 @@ let Test={
 			this.uniformDimensions();
 			this.minMax();
 		}// end for l
-	//	this.createPoints(dimensions, pointCount,);
 		console.log("Test done. Errors found: "+this.errorsFound);
 	},// end #testBuilding()
 
@@ -214,11 +237,14 @@ let Test={
 		//console.log("Test.minMax -- end");
 	},// end #minMax()
 	
-	/* tests removal of points */
+	/* tests removal of points
+	will remove 2% of the points in .tree and checks if the 'structure()' stays
+	correct and every point stays in tree, that is not (yet) removed, and every
+	points is gone that should be removed.
+	*/
 db_toRemove:[],
 	remove:function(){
 		let pointsToRemoveMax=Number.parseInt(this.points.length*0.02);
-//pointsToRemoveMax=1;
 		let pointsToRemove=Array(pointsToRemoveMax);
 this.db_toRemove=pointsToRemove;
 console.log("db: removing "+pointsToRemoveMax+" points")
@@ -230,7 +256,7 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 			do{
 				idx=Number.parseInt(Math.random()*(this.points.length-1))+1;
 			}while(pointsToRemove.indexOf(idx)>=0);
-			pointsToRemove[i]=idx;
+			pointsToRemove[i]=idx; // */
 
 			let p=this.points[idx]; // point to remove
 			let ret=this.tree.removePoint(p); // remove
@@ -276,5 +302,5 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 
 	
 
-	dummy:0
+	dummy:0 // <- no meaning, helps not thinking about missing ',' after every not-last entry in an object
 };

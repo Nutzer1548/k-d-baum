@@ -201,7 +201,7 @@ function KDTree(point, dimension){
 			if(this.nodes[1]===null) return [this, root];
 			return this.nodes[1].nodeMax(dimension, this);
 		}
-		
+
 		if(this.isLeaf()) return [this, root];
 
 		let maxA=null, maxAroot=null;
@@ -334,6 +334,16 @@ function KDTree(point, dimension){
 			return false;
 		}
 
+		if(this.nodes[0]!==null){
+			let minNode, minRoot, ret;
+			[minNode, minRoot]=this.nodes[0].nodeMax(this.dim, this);
+
+			this.pnt=minNode.pnt.slice();
+			ret=minNode.remove(minRoot);
+//			if(!ret) return false;
+			return ret;
+		}
+
 		if(this.nodes[1]!==null){
 			let nodeList, minVal, ret;
 			[nodeList, minVal]=this.nodes[1].nodeMinList(this.dim, this, 1);
@@ -343,21 +353,15 @@ function KDTree(point, dimension){
 			if(!ret) return false;
 
 			for(let i=1; i<nodeList.length; i++){
-				this.add(nodeList[i][0].pnt);
+				let p=nodeList[i][0].pnt;
+				//this.add(nodeList[i][0].pnt);
 				ret=nodeList[i][0].remove(nodeList[i][1]);
+				this.add(p);
 				if(!ret) return false;
 			}
 			return true;
 		}
 
-		if(this.nodes[0]!==null){
-			let minNode, minRoot, ret;
-			[minNode, minRoot]=this.nodes[0].nodeMax(this.dim, this);
-
-			this.pnt=minNode.pnt.slice();
-			ret=minNode.remove(minRoot);
-			if(!ret) return false;
-		}
 
 
 		return true;

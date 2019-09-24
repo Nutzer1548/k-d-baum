@@ -18,6 +18,7 @@ Functions:
 .findMissingPoints(): returns points in '.points' that are not in '.tree'
 .createPoints(dim,cnt): fills '.points' with 'cnt' random points with 'dim' dimensions
 .everything(dim,cnt): runs all tests using 'cnt' points with 'dim' dimensions
+.nearestPoint(): tests finding of nearest Point in Tree
 .testBuilding(dim,cnt,loop): tests insertion of 'cnt' points with dimension 'dim', 'loop' times
 .uniformDimensions(node): tests 'node' and its children for alternating splitting dimension.
 .structure(node): tests if children of 'node' are placed on the correct side.
@@ -125,6 +126,7 @@ let Test={
 		this.structure();
 		this.uniformDimensions();
 		this.minMax();
+		this.nearestPoint();
 		this.remove(); 
 		console.log("Done with everything. Errors found: "+this.errorsFound);
 	},// end everything()
@@ -300,6 +302,63 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 		}// end for i
 	},// end #remove()
 
+	/*
+	Tests the 'findNearestPoint()' function of KDTree
+	*/
+	nearestPoint:function(loopMax){
+		if(typeof loopMax==="undefined") loopMax=20;
+		let dim=this.points[0].length;
+		for(let loop=0; loop<loopMax; loop++){
+			let pnt=Array(dim);
+			for(let d=0; d<dim; d++) pnt[d]=Number.parseInt(Math.random()*100);
+
+			// what the tree sais
+			let nearTree, distTree;
+			[nearTree, distTree]=this.tree.findNearestPoint(pnt);
+
+			// what it should say
+			let nearArr, distArr=Number.MAX_VALUE;
+			for(let i=0; i<this.points.length; i++){
+				let p=this.points[i];
+				let dist=0;
+				for(let d=0; d<dim; d++){
+					dist+=(p[d]-pnt[d])*(p[d]-pnt[d]);
+				}// end for d
+				dist=Math.sqrt(dist);
+				if(dist<distArr){
+					distArr=dist;
+					nearArr=p.slice();
+				}
+			}// end for i
+
+			// same point?
+			let samePoint=true;
+			for(let d=0; d<dim; d++){
+				if(nearArr[d]!=nearTree[d]){
+					samePoint=false;
+					break;
+				}
+			}
+
+			// same dist?
+			//let sameDist=Math.abs(distTree-distArr)<1e-20;
+			let sameDist=Math.abs(distTree-distArr)==0;
+
+			if(!samePoint && !sameDist){
+				console.log("nearestPoint | loop "+loop+", pnt="+pnt+": wrong Point!\n Tree: "+nearTree+", dist="+distTree+
+				            " --- Should be: "+nearArr+", dist="+distArr);
+				this.errorsFound++;
+			}
+
+			if(!sameDist){
+				console.log("nearestPoint | loop "+loop+", pnt="+pnt+": wrong Distance!\n Tree: "+nearTree+", dist="+distTree+
+				            " --- Should be: "+nearArr+", dist="+distArr);
+				this.errorsFound++;
+			}
+
+
+		}// end for loop
+	},// end #nearestPoint()
 	
 
 	dummy:0 // <- no meaning, helps not thinking about missing ',' after every not-last entry in an object

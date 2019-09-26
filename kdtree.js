@@ -52,34 +52,60 @@ function KDTree(point, dimension){
 		return this.nodes[nodeIdx];
 	};// end #add();
 
-	/*
+	/* 
 	finds the point in this KDTree, that's nearest to point 'point'
 	point: point to approach to
-	minDist: initial distance to be beaten. If undefined, set to Number.MAX_VALUE
+	minDist: initial distance (squared) to be beaten. If undefined, set to Number.MAX_VALUE
 	return: [point_in_tree, distance]
 	*/
 	this.findNearestPoint=function(point, minDist){
 		if(typeof minDist==="undefined") minDist=Number.MAX_VALUE;
 
-		let dist=this.pointDistance(this.pnt, point);
+		let dist=this.pointDistanceSquared(point);
 		let pit=null;
-		let pit2=null;
+
 		if(dist<minDist){
-			pit=this.pnt;
 			minDist=dist;
+			pit=this.pnt;
 		}
 
-		if(this.nodes[1]!==null){
-			if(point[this.dim]+minDist > this.pnt[this.dim]) [pit2,minDist]=this.nodes[1].findNearestPoint(point,minDist);
-			if(pit2!==null) pit=pit2;
+		let dimDist=this.pnt[this.dim]-point[this.dim];
+		dimDist*=dimDist;
+
+		let test0=(point[this.dim]<=this.pnt[this.dim]);// point is smaller than 'pnt' in dimension 'dim'
+		let test1=!test0;
+
+		if(!test0 && dimDist<minDist) test0=true;
+		if(!test1 && dimDist<minDist) test1=true;
+
+		let nodePit, nodeDist;
+		if(test0 && this.nodes[0]!==null){
+			[nodePit, nodeDist]=this.nodes[0].findNearestPoint(point, minDist);
+			if(nodePit!==null){
+				pit=nodePit;
+				minDist=nodeDist;
+			}
 		}
-		if(this.nodes[0]!==null){
-			if(point[this.dim]-minDist <= this.pnt[this.dim]) [pit2, minDist]=this.nodes[0].findNearestPoint(point, minDist);
-			if(pit2!==null) pit=pit2;
+		if(test1 && this.nodes[1]!==null){
+			[nodePit, nodeDist]=this.nodes[1].findNearestPoint(point, minDist);
+			if(nodePit!==null){
+				pit=nodePit;
+				minDist=nodeDist;
+			}
 		}
 
 		return [pit, minDist];
 	};// end #findNearestPoint()
+
+	/* returns the squared distance between this point and 'pnt' */
+	this.pointDistanceSquared=function(pnt2){
+		let sum=0;
+		for(let d=0; d<this.pnt.length; d++){
+			let p=this.pnt[d]-pnt2[d];
+			sum+=p*p;
+		}
+		return sum;
+	};// end #pointDistanceSquared()
 
 
 	/* returns the distance between two points

@@ -315,6 +315,7 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 			// what the tree sais
 			let nearTree, distTree;
 			[nearTree, distTree]=this.tree.findNearestPoint(pnt);
+			distTree=Math.sqrt(distTree);
 
 			// what it should say
 			let nearArr, distArr=Number.MAX_VALUE;
@@ -339,6 +340,7 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 					break;
 				}
 			}
+
 
 			// same dist?
 			//let sameDist=Math.abs(distTree-distArr)<1e-20;

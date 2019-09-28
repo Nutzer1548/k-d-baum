@@ -478,5 +478,54 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 		            "  Median over "+loops+" tries: "+(time/1000)+"s,  best: "+
 		            (timeMin/1000)+"s, worst: "+(timeMax/1000)+"s");
 	},// end #pfmCreateBalanced()
+
+	/* Tests speed of KDTree.getNode()
+	dimensions: dimensions for each point. if undefined, works on the current tree
+	pointCount: points to generate
+	loops: number of runs to process
+	balanced: 'true' to create a balanced tree
+	*/
+	pfmGetNode:function(dimensions, pointCount, loops, balanced){
+		if(typeof loops==="undefined") loops=1;
+		// create tree if wished
+		if(typeof dimensions!=="undefined"){
+			this.createPoints(dimensions, pointCount);
+			if(typeof balanced==="undefined") balanced=true;
+			if(balanced) this.tree=KDTree.createBalanced(this.points);
+			else{
+				this.tree=new KDTree(this.points[0]);
+				for(let i=1; i<this.points.length; i++) this.tree.add(this.points[i]);
+			}
+		}
+		// find points:
+		let times=Array(this.points.length);
+		let timeStart, timeEnd;
+		let node, nodeRoot;
+		for(let i=0; i<this.points.length; i++) times[i]=0;
+		for(let l=0; l<loops; l++){
+			for(let i=0; i<this.points.length; i++){
+				timeStart=performance.now();
+				[node, nodeRoot]=this.tree.getNode(this.points[i]);
+				timeEnd=performance.now();
+				times[i]+=timeEnd-timeStart;
+			}// end for i
+		}// end for l
+
+		let time=0;
+		let timeMin=Number.MAX_VALUE;
+		let timeMax=Number.MIN_VALUE;
+		for(let t of times){
+			t/=loops;
+			if(t<timeMin) timeMin=t;
+			if(t>timeMax) timeMax=t;
+			time+=t;
+		}
+		time/=this.points.length;
+		console.log("Performance of .getNode(). "+this.points[0].length+" dimensions, "+this.points.length+" points.\n"+
+		            "  Median over "+loops+" tries: "+(time/1000)+"s,  best: "+
+		            (timeMin/1000)+"s, worst: "+(timeMax/1000)+"s");
+	},// end #pfmGetNode()
+
+
 	dummy:0 // <- no meaning, helps not thinking about missing ',' after every not-last entry in an object
 };

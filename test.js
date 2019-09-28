@@ -143,7 +143,7 @@ let Test={
 	dimensions: dimensions to simulate. defaults to 3
 	pointCount: the amount of points to create. defaults to 1000
 	*/
-	everthing:function(dimensions, pointCount){
+	everything:function(dimensions, pointCount){
 		if(typeof dimensions==="undefined") dimensions=3;
 		if(typeof pointCount==="undefined") pointCount=1000;
 		this.errorsFound=0;

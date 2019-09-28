@@ -575,5 +575,50 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 		            (timeMin/1000)+"s, worst: "+(timeMax/1000)+"s");
 	},// end #pfmNOTGetNode()
 
+	/* Tests speed of KDTree.findNearesPoint()
+	dimensions: dimensions for each point. if undefined, works on the current tree
+	pointCount: points to generate
+	loops: number of runs to process
+	balanced: 'true' to create a balanced tree
+	*/
+	pfmFindNearestPoint:function(dimensions, pointCount, loops, balanced){
+		if(typeof loops==="undefined") loops=100;
+		// create tree if wished
+		if(typeof dimensions!=="undefined"){
+			this.createPoints(dimensions, pointCount);
+			if(typeof balanced==="undefined") balanced=true;
+			if(balanced) this.tree=KDTree.createBalanced(this.points);
+			else{
+				this.tree=new KDTree(this.points[0]);
+				for(let i=1; i<this.points.length; i++) this.tree.add(this.points[i]);
+			}
+		}
+
+		let times=Array(loops);
+		let timeStart, timeEnd;
+		let node, dist, pnt=Array(this.points[0].length);
+		for(let l=0; l<loops; l++){
+			for(let d=0; d<this.points[0].length; d++) pnt[d]=Number.parseInt(Math.random()*100);
+			timeStart=performance.now();
+			[node, dist]=this.tree.findNearestPoint(pnt);
+			timeEnd=performance.now();
+			times[l]=timeEnd-timeStart;
+		}// end for l
+
+		let time=0;
+		let timeMin=Number.MAX_VALUE;
+		let timeMax=Number.MIN_VALUE;
+		for(let t of times){
+			if(t<timeMin) timeMin=t;
+			if(t>timeMax) timeMax=t;
+			time+=t;
+		}
+		time/=loops;
+		console.log("Performance of .findNearestPoint(). "+this.points[0].length+" dimensions, "+this.points.length+" points.\n"+
+		            "  Median over "+loops+" tries: "+(time/1000)+"s,  best: "+
+		            (timeMin/1000)+"s, worst: "+(timeMax/1000)+"s");
+	},// end #pfmFindNearestPoint()
+
+
 	dummy:0 // <- no meaning, helps not thinking about missing ',' after every not-last entry in an object
 };

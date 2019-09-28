@@ -409,5 +409,43 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 		return left+right+1;
 	},// end #isBalanced()
 
+
+	/*
+	############################################################
+	performance tests
+	############################################################
+	*/
+
+	/* Tests speed of KDTree.add()
+	dimensions: dimensions for each point
+	pointCount: points to generate
+	loops: number of runs to process
+	*/
+	pfmAdd:function(dimensions, pointCount, loops){
+		let times=Array(loops);
+		let timeStart, timeEnd;
+		this.createPoints(dimensions, pointCount);
+		for(let l=0; l<loops; l++){
+			timeStart=performance.now();
+			this.tree=new KDTree(this.points[0]);
+			for(let i=1; i<pointCount; i++) this.tree.add(this.points[i]);
+			timeEnd=performance.now();
+			times[l]=timeEnd-timeStart;
+		}// end for l
+
+		let time=0;
+		let timeMin=Number.MAX_VALUE;
+		let timeMax=Number.MIN_VALUE;
+		for(let t of times){
+			if(t<timeMin) timeMin=t;
+			if(t>timeMax) timeMax=t;
+			time+=t;
+		}
+		time/=loops;
+		console.log("Performance of .add(). "+dimensions+" dimensions, "+pointCount+" points.\n"+
+		            "  Median over "+loops+" tries: "+(time/1000)+"s,  best: "+
+		            (timeMin/1000)+"s, worst: "+(timeMax/1000)+"s");
+	},// end #pfmAdd()
+
 	dummy:0 // <- no meaning, helps not thinking about missing ',' after every not-last entry in an object
 };

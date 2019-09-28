@@ -94,10 +94,19 @@ let Test={
 		return ret;
 	},// end #findMissingPoints()
 
-	/* creates points for testing the tree with */
+	/*
+	creates unique points for testing the tree with
+	*/
 	createPoints:function(dimensions, maxPoints){
 		if(typeof dimensions==="undefined") dimensions=3;
 		if(typeof maxPoints==="undefined") maxPoints=200;
+		let dimRange=100;
+		let minDimRange=Math.pow(maxPoints, 1/(dimensions-0.5));
+		if(minDimRange>dimRange){
+			dimRange=Math.pow(10, Math.floor(Math.log10(minDimRange)+1));
+			/*console.log("Room for unique point generation is a little narrow for creating "+maxPoints+
+						" points in the range of 0-100.\n'- adjusting range to 0-"+dimRange+" instead!"); // */
+		}
 
 		// create points
 		let dim=dimensions; // dimensions for points
@@ -105,8 +114,18 @@ let Test={
 		let points=Array(numMax);
 		for(let num=0; num<numMax; num++){
 			let pnt=Array(dim);
-//			for(let d=0; d<dim; d++) pnt[d]=Math.random();
-			for(let d=0; d<dim; d++) pnt[d]=Number.parseInt(Math.random()*100);
+			let matches;
+			do{
+//				for(let d=0; d<dim; d++) pnt[d]=Math.random();
+				for(let d=0; d<dim; d++) pnt[d]=Number.parseInt(Math.random()*dimRange);
+				matches=false;
+				for(let i=0; i<num && matches<dim; i++){
+					matches=0;
+					for(let d=0; d<dim; d++)
+						if(points[i][d]==pnt[d]) matches++;
+				}
+
+			}while(matches>=dim);// repeat while point already exists
 			points[num]=pnt;
 		}
 		this.points=points;

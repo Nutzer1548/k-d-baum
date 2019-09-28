@@ -52,6 +52,7 @@ function KDTree(point, dimension){
 		return this.nodes[nodeIdx];
 	};// end #add();
 
+
 	/* 
 	finds the point in this KDTree, that's nearest to point 'point'
 	point: point to approach to
@@ -440,3 +441,39 @@ if(node===null) console.log("removePoint(): can't find node with point "+point);
 
 }// end KDTree()
 
+/*
+creates a balanced tree, asuming the current tree is empty
+pointList: list of points to create the tree with. the order of elements might
+  be different when this function returns.
+dim: first splitting dimension, defaults to 0
+return: the created balnced tree
+*/
+KDTree.createBalanced=function(pointList, dim){
+	if(typeof dim==="undefined") dim=0;
+	let maxDim=pointList[0].length;
+	// sort by dimensions ('dim' first)
+	pointList.sort(function(a,b){
+		for(let i=0; i<a.length; i++){
+			let d=(dim+i)%maxDim;
+			let v=a[d]-b[d];
+			if(v!=0) return v;
+		}
+		return 0;
+	});
+
+	// get the highest indes of the median value
+	let medianIdx=Math.floor(pointList.length/2);
+	while(medianIdx<pointList.length-1){
+		if(pointList[medianIdx+1][dim]!=pointList[medianIdx][dim]) break;
+		medianIdx++;
+	}
+	let tree=new KDTree(pointList[medianIdx], dim);
+
+	let side0=pointList.slice(0,medianIdx);
+	if(side0.length>0) tree.nodes[0]=KDTree.createBalanced(side0, (dim+1)%maxDim);
+
+	let side1=pointList.slice(medianIdx+1);
+	if(side1.length>0) tree.nodes[1]=KDTree.createBalanced(side1, (dim+1)%maxDim);
+
+	return tree;
+};// end #createBalanced()

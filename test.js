@@ -32,8 +32,12 @@ let Test={
 	points:[], // points to store in the tree
 	tree:null, // KDTree
 
-	/* adds point in a tree and tries to find them afterwards */
-	add:function(){
+	/*
+	adds point in a tree and tries to find them afterwards
+	balaned: if true, a balanced tree will be created. defaults to true
+	*/
+	add:function(balanced){
+		if(typeof balanced==="undefined") balanced=true;
 		//console.log("Test.add() --- start");
 
 		let points=this.points;
@@ -41,32 +45,36 @@ let Test={
 		let numMax=points.length;
 
 		// create tree from points
-		this.tree=new KDTree(points[0]);
-		for(let num=1; num<numMax; num++){
-			let ret=this.tree.add(points[num]);
-			if(typeof ret!=="object"){
-				this.errorsFound++;
-				console.log("tree.add(): wrong return-type: "+(typeof ret)+" (point: "+points[num]+")");
-			}
-			// test inserted point
-			for(let d=0; d<dim; d++){
-				if(ret.pnt[d]==points[num][d]) continue;
-				this.errorsFound++;
-				console.log('tree.add(): return node represents wrong point.');
-			}
-		}// end for num
+		if(balanced){
+			this.tree=KDTree.createBalanced(this.points);
+		}else{
+			this.tree=new KDTree(points[0]);
+			for(let num=1; num<numMax; num++){
+				let ret=this.tree.add(points[num]);
+				if(typeof ret!=="object"){
+					this.errorsFound++;
+					console.log("tree.add(): wrong return-type: "+(typeof ret)+" (point: "+points[num]+")");
+				}
+				// test inserted point
+				for(let d=0; d<dim; d++){
+					if(ret.pnt[d]==points[num][d]) continue;
+					this.errorsFound++;
+					console.log('tree.add(): return node represents wrong point.');
+				}
+			}// end for num
+		}
 
 		// tests if every point is in tree
 		for(let num=0; num<numMax; num++){
 			let node, root;
 			[node, root]=this.tree.getNode(points[num]);
 			if(node===null){
-				if(num==0) node=root;
-				else{
-					console.log("tree.add(): point["+num+"]="+points[num]+" not found in tree");
-					this.errorsFound++;
+				if(this.tree.pointEqual(points[num])){ // point is root node
 					continue;
 				}
+				console.log("tree.add(): point["+num+"]="+points[num]+" not found in tree");
+				this.errorsFound++;
+				continue;
 			}
 			if(!this.tree.pointEqual(node.pnt, points[num])){
 				if(num==0) continue;
@@ -380,7 +388,26 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 
 		}// end for loop
 	},// end #nearestPoint()
-	
+
+	/*
+	Tests how balanced 'subtree' is. If one side is off the others by more
+	than 1, a message will be displayed.
+	originaly wrote to test KDTree.createBalanced(), but since every dublicate
+	value in the splitting dimension, there allway will be some unbalances.
+	return: count of nodes in subtree including itself
+	*/
+	isBalanced:function(subtree){
+		if(subtree.isLeaf()) return 1;
+		let left=0, right=0;
+		if(subtree.nodes[0]!==null) left=this.isBalanced(subtree.nodes[0]);
+		if(subtree.nodes[1]!==null) right=this.isBalanced(subtree.nodes[1]);
+
+
+		if(Math.abs(right-left)>1){
+			console.log("isBalanced(): unbalanced distribution of "+(right-left));
+		}
+		return left+right+1;
+	},// end #isBalanced()
 
 	dummy:0 // <- no meaning, helps not thinking about missing ',' after every not-last entry in an object
 };

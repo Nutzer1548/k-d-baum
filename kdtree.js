@@ -451,17 +451,12 @@ return: the created balnced tree
 KDTree.createBalanced=function(pointList, dim){
 	if(typeof dim==="undefined") dim=0;
 	let maxDim=pointList[0].length;
-	// sort by dimensions ('dim' first)
+	// sort by dimensions 'dim' 
 	pointList.sort(function(a,b){
-		for(let i=0; i<a.length; i++){
-			let d=(dim+i)%maxDim;
-			let v=a[d]-b[d];
-			if(v!=0) return v;
-		}
-		return 0;
+		return a[dim]-b[dim];
 	});
 
-	// get the highest indes of the median value
+	// get the highest index of the middle value
 	let medianIdx=Math.floor(pointList.length/2);
 	while(medianIdx<pointList.length-1){
 		if(pointList[medianIdx+1][dim]!=pointList[medianIdx][dim]) break;
@@ -469,11 +464,10 @@ KDTree.createBalanced=function(pointList, dim){
 	}
 	let tree=new KDTree(pointList[medianIdx], dim);
 
-	let side0=pointList.slice(0,medianIdx);
-	if(side0.length>0) tree.nodes[0]=KDTree.createBalanced(side0, (dim+1)%maxDim);
 
-	let side1=pointList.slice(medianIdx+1);
-	if(side1.length>0) tree.nodes[1]=KDTree.createBalanced(side1, (dim+1)%maxDim);
+	if(medianIdx>0) tree.nodes[0]=KDTree.createBalanced(pointList.slice(0, medianIdx), (dim+1)%maxDim);
+	if(medianIdx+1<pointList.length) tree.nodes[1]=KDTree.createBalanced(pointList.slice(medianIdx+1), (dim+1)%maxDim);
 
 	return tree;
 };// end #createBalanced()
+

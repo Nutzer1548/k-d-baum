@@ -14,16 +14,23 @@ Fields:
 
 Functions:
 ----------
-.add(): adds the points in the 'points' field to tbhe kdtree and ensures they are there
-.findMissingPoints(): returns points in '.points' that are not in '.tree'
-.createPoints(dim,cnt): fills '.points' with 'cnt' random points with 'dim' dimensions
-.everything(dim,cnt): runs all tests using 'cnt' points with 'dim' dimensions
-.nearestPoint(): tests finding of nearest Point in Tree
-.testBuilding(dim,cnt,loop): tests insertion of 'cnt' points with dimension 'dim', 'loop' times
-.uniformDimensions(node): tests 'node' and its children for alternating splitting dimension.
-.structure(node): tests if children of 'node' are placed on the correct side.
-.minMax(): tests if .tree.nodeMin()/.nodeMax() returns correct values
-.remove(): tests removal of points
+.add(): Adds the points in the 'points' field to tbhe kdtree and ensures they are there
+.createPoints(dim,cnt): Fills '.points' with 'cnt' random points with 'dim' dimensions
+.everything(dim,cnt): Runs all tests using 'cnt' points with 'dim' dimensions
+.findMissingPoints(): Returns points in '.points' that are not in '.tree'
+.isBalanced(subtree): Tests how balanced 'subtree' is. Only a little informative.
+.minMax(): Tests if .tree.nodeMin()/.nodeMax() returns correct values
+.nearestPoint(): Tests finding of nearest Point in Tree
+.pfmAdd(dim,cnt,loop): Tests performance of KDTree.add()
+.pfmCreateBalanced(dim,cnt,loop): Tests performance of KDTree.createBalanced()
+.pfmGetNode(dim,cnt,loop,balanced): Tests performance of KDTree.getNode()
+.pfmNOTGetNode(dim,cnt,loop,balanced): Tests performance of _not_ using KDTree.getNode()
+.pfmFindNearestPoint(dim,cnt,loop,balanced): Tests performance of KDTree.findNearestPoint()
+.pfmNOTFindNearestPoint(dim,cnt,loop,balanced): Tests performance of _not_ using KDTree.findNearestPoint()
+.remove(): Tests removal of points
+.structure(node): Tests if children of 'node' are placed on the correct side.
+.testBuilding(dim,cnt,loop): Tests insertion of 'cnt' points with dimension 'dim', 'loop' times
+.uniformDimensions(node): Tests 'node' and its children for alternating splitting dimension.
 
 */
 
@@ -38,7 +45,6 @@ let Test={
 	*/
 	add:function(balanced){
 		if(typeof balanced==="undefined") balanced=true;
-		//console.log("Test.add() --- start");
 
 		let points=this.points;
 		let dim=this.points[0].length;
@@ -123,7 +129,7 @@ let Test={
 		for(let num=0; num<numMax; num++){
 			let pnt=Array(dim);
 			let matches;
-			do{
+			do{// loop for uniquness
 //				for(let d=0; d<dim; d++) pnt[d]=Math.random();
 				for(let d=0; d<dim; d++) pnt[d]=Number.parseInt(Math.random()*dimRange);
 				matches=false;
@@ -233,7 +239,6 @@ let Test={
 
 	/* tests tree.nodeMin/.nodeMax */
 	minMax:function(){
-		//console.log("Test.minMax -- start");
 		let node, root;
 		[node, root]=this.tree.nodeMin(0);
 		let pointMin, pointMax;
@@ -251,19 +256,16 @@ let Test={
 			}// end for i
 			// compare with .tree results
 			[node, root]=this.tree.nodeMin(d);
-			//if(!this.tree.pointEqual(node.pnt, pointMin)){
 			if(pointMin[d]>node.pnt[d]){
 				this.errorsFound++;
 				console.log("minMax(): minimum in dimension "+d+" should be "+pointMin+" but returned was "+node.pnt);
 			}
 			[node, root]=this.tree.nodeMax(d);
-			//if(!this.tree.pointEqual(node.pnt, pointMax)){
 			if(pointMax[d]<node.pnt){
 				this.errorsFound++;
 				console.log("minMax(): maximum in dimension "+d+" should be "+pointMax+" but returned was "+node.pnt);
 			}
 		}// end for d
-		//console.log("Test.minMax -- end");
 	},// end #minMax()
 	
 	/* tests removal of points
@@ -285,7 +287,7 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 			do{
 				idx=Number.parseInt(Math.random()*(this.points.length-1))+1;
 			}while(pointsToRemove.indexOf(idx)>=0);
-			pointsToRemove[i]=idx; // */
+			pointsToRemove[i]=idx;
 
 			let p=this.points[idx]; // point to remove
 			let ret=this.tree.removePoint(p); // remove
@@ -474,7 +476,7 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 			time+=t;
 		}
 		time/=loops;
-		console.log("Performance of .createBlanced(). "+dimensions+" dimensions, "+pointCount+" points.\n"+
+		console.log("Performance of .createBalanced(). "+dimensions+" dimensions, "+pointCount+" points.\n"+
 		            "  Median over "+loops+" tries: "+(time/1000)+"s,  best: "+
 		            (timeMin/1000)+"s, worst: "+(timeMax/1000)+"s");
 	},// end #pfmCreateBalanced()
@@ -575,7 +577,7 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 		            (timeMin/1000)+"s, worst: "+(timeMax/1000)+"s");
 	},// end #pfmNOTGetNode()
 
-	/* Tests speed of KDTree.findNearesPoint()
+	/* Tests speed of KDTree.findNearestPoint()
 	dimensions: dimensions for each point. if undefined, works on the current tree
 	pointCount: points to generate
 	loops: number of runs to process
@@ -619,7 +621,7 @@ console.log("db: removing "+pointsToRemoveMax+" points")
 		            (timeMin/1000)+"s, worst: "+(timeMax/1000)+"s");
 	},// end #pfmFindNearestPoint()
 
-	/* Tests speed of NOT using KDTree.findNearesPoint()
+	/* Tests speed of NOT using KDTree.findNearestPoint()
 	dimensions: dimensions for each point. if undefined, works on the current tree
 	pointCount: points to generate
 	loops: number of runs to process
